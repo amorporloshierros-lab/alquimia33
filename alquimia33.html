@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALQUIMIA33 — Cerveza Artesanal Premium · San Telmo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IBM+Plex+Mono:wght@300;400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --void:#09070F;--dp:#140920;--dm:#1E0B30;--dl:#2D1050;
+  --gold:#C9950E;--glit:#E2B830;--amb:#B86820;
+  --cream:#EDE8DE;--txt:#D8CFC0;--muted:#7A6A52;--grn:#22C55E;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--void);}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px;}
+.cinzel{font-family:'Cinzel',serif;}
+.corm{font-family:'Cormorant Garamond',serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.gg{background:linear-gradient(135deg,var(--gold),var(--amb),var(--glit));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+@keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+.sg{background:linear-gradient(90deg,var(--gold) 0%,#fff3c0 40%,var(--gold) 60%,var(--glit) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite;}
+.noise{position:fixed;inset:0;z-index:9999;pointer-events:none;filter:url(#nf);opacity:.038;mix-blend-mode:overlay;}
+.mag{position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.16,1,.3,1);cursor:pointer;}
+.mag:hover{transform:scale(1.03);}
+.mag .mf{position:absolute;inset:0;transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.mag:hover .mf{transform:translateY(0);}
+.mag>span{position:relative;z-index:1;}
+.hpill{border-radius:9999px;border:1px solid transparent;background:transparent;backdrop-filter:blur(0);transition:all .5s cubic-bezier(.16,1,.3,1);}
+.hpill.sc{background:rgba(9,7,15,.92);backdrop-filter:blur(28px);border-color:rgba(201,149,14,.22);}
+
+/* ═══ HERO VIDEO ═══ */
+#hero{position:relative;width:100%;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+#heroVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+#heroOverlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(9,7,15,.55) 0%,rgba(9,7,15,.4) 50%,rgba(9,7,15,.75) 100%);z-index:1;}
+#heroCurtain{position:absolute;inset:0;background:var(--void);z-index:8;pointer-events:none;}
+#heroContent{position:relative;z-index:3;text-align:center;max-width:1000px;padding:0 2rem;}
+@keyframes scrl{0%,100%{transform:translateX(-50%) translateY(0);opacity:.7;}50%{transform:translateX(-50%) translateY(8px);opacity:.25;}}
+.scrl{position:absolute;bottom:1.8rem;left:50%;display:flex;flex-direction:column;align-items:center;gap:.4rem;z-index:4;animation:scrl 2.2s ease-in-out infinite;}
+.stag{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.85;}
+
+/* Stars */
+.star{position:absolute;border-radius:50%;background:#fff;}
+@keyframes twk{0%,100%{opacity:.8;}50%{opacity:.15;}}
+
+/* Cards */
+.card{background:linear-gradient(160deg,rgba(30,11,48,.85),rgba(20,9,32,.92));border:1px solid rgba(201,149,14,.16);border-radius:2rem;overflow:hidden;}
+@keyframes pls{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(1.7);}}
+.pdot{animation:pls 2s ease-in-out infinite;}
+
+/* Shuffler cards */
+.sc-card{position:absolute;inset:0;border-radius:1.25rem;padding:1.4rem;transition:all .5s cubic-bezier(.16,1,.3,1);border:1px solid rgba(201,149,14,.3);}
+.sc-c0{background:#140920;}.sc-c1{background:#1A0A2E;}.sc-c2{background:#200B38;}
+
+/* Quill / Process */
+.parchment{
+  background:linear-gradient(160deg,rgba(14,10,22,.95),rgba(18,11,30,.95));
+  border:1px solid rgba(201,149,14,.15);border-radius:1.25rem;padding:1.5rem 1.5rem 1.5rem 1rem;
+  position:relative;overflow:hidden;min-height:210px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 0 60px rgba(201,149,14,.03);
+}
+.parchment::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(201,149,14,.04) 28px,rgba(201,149,14,.04) 29px);pointer-events:none;}
+#quillSvg{position:absolute;pointer-events:none;z-index:4;transition:top .5s cubic-bezier(.16,1,.3,1);}
+.quill-line{
+  font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;
+  color:transparent;line-height:2;display:flex;align-items:center;gap:.5rem;
+  transition:color .7s,text-shadow .7s;position:relative;z-index:2;
+}
+.quill-line.written{color:rgba(226,184,48,.88);text-shadow:0 0 18px rgba(201,149,14,.35),0 2px 4px rgba(0,0,0,.4);}
+.quill-line .sym{color:rgba(201,149,14,.5);font-size:.8rem;flex-shrink:0;}
+
+/* Reveal */
+.rv{opacity:0;transform:translateY(44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.rvl{opacity:0;transform:translateX(-44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.rvr{opacity:0;transform:translateX(44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.rv.vis,.rvl.vis,.rvr.vis{opacity:1;transform:none;}
+
+/* Tap list */
+.titem{display:flex;align-items:center;gap:.75rem;padding:.72rem 1rem;background:rgba(30,11,48,.5);border:1px solid rgba(201,149,14,.09);border-radius:.85rem;cursor:pointer;transition:border-color .3s,background .3s;}
+.titem:hover{border-color:rgba(201,149,14,.35);background:rgba(30,11,48,.8);}
+
+/* Image fragment */
+.img-frag{position:absolute;inset:0;background-image:url('./WhatsApp Image 2026-05-14 at 09.49.15.jpeg');background-size:cover;pointer-events:none;}
+
+/* Beer flip cards */
+.bcard{perspective:1000px;cursor:pointer;}
+.bcard-in{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.16,1,.3,1);}
+.bcard:hover .bcard-in{transform:rotateY(180deg);}
+.bfront,.bback{backface-visibility:hidden;border-radius:1.75rem;}
+.bback{position:absolute;inset:0;transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+
+/* Protocol */
+.proto{background:linear-gradient(135deg,var(--dm),var(--dl));border:1px solid rgba(201,149,14,.2);border-radius:2rem;}
+
+/* People photos grid */
+.people-photo{
+  position:relative;height:280px;overflow:hidden;border-radius:1.5rem;cursor:pointer;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.people-photo:hover{transform:scale(1.02);}
+.people-photo img{width:100%;height:100%;object-fit:cover;filter:brightness(.78) saturate(1.15);transition:filter .4s;}
+.people-photo:hover img{filter:brightness(.9) saturate(1.3);}
+.people-photo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(9,7,15,.8) 0%,transparent 55%);pointer-events:none;}
+
+/* Footer */
+.ftr{background:var(--void);border-radius:3rem 3rem 0 0;border-top:1px solid rgba(201,149,14,.16);}
+.fl{color:var(--muted);font-size:.82rem;text-decoration:none;transition:color .3s;}
+.fl:hover{color:var(--cream);}
+
+/* ══════════════════════
+   VASO DE CERVEZA — CHATBOT BUTTON
+══════════════════════ */
+#floatBot{position:fixed;bottom:1.8rem;right:1.8rem;z-index:800;display:flex;flex-direction:column;align-items:flex-end;gap:.55rem;}
+#chatLabel{
+  background:linear-gradient(135deg,rgba(20,9,32,.96),rgba(45,16,80,.96));
+  border:1px solid rgba(201,149,14,.30);border-radius:1rem 1rem 0 1rem;
+  padding:.55rem 1rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;
+  color:var(--gold);letter-spacing:.08em;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s;pointer-events:none;
+}
+#floatBot:hover #chatLabel{opacity:1;transform:translateY(0);}
+#vasoBtn{cursor:pointer;transition:filter .3s,transform .3s;filter:drop-shadow(0 4px 16px rgba(201,149,14,.28));}
+#vasoBtn:hover{transform:scale(1.06);filter:drop-shadow(0 6px 26px rgba(201,149,14,.55));}
+@keyframes vasoPls{0%,100%{filter:drop-shadow(0 4px 16px rgba(201,149,14,.28));}50%{filter:drop-shadow(0 4px 26px rgba(201,149,14,.75));}}
+#vasoBtn.pulsing{animation:vasoPls 1.6s ease-in-out 4;}
+
+/* Chat panel */
+#chatPanel{width:340px;background:linear-gradient(160deg,rgba(9,7,15,.97),rgba(20,9,32,.97));border:1px solid rgba(201,149,14,.28);border-radius:1.75rem;overflow:hidden;backdrop-filter:blur(30px);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(201,149,14,.06);display:none;flex-direction:column;max-height:530px;}
+#chatPanel.open{display:flex;}
+.chat-hdr{padding:1rem 1.25rem;border-bottom:1px solid rgba(201,149,14,.12);display:flex;align-items:center;gap:.85rem;background:linear-gradient(90deg,rgba(45,16,80,.4),transparent);}
+.chat-av{width:46px;height:46px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 0 18px rgba(201,149,14,.4);}
+.chat-msgs{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.8rem;max-height:330px;}
+.chat-msgs::-webkit-scrollbar{width:2px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--gold);}
+.bbot{background:linear-gradient(135deg,rgba(201,149,14,.09),rgba(184,104,32,.06));border:1px solid rgba(201,149,14,.16);border-radius:1.25rem 1.25rem 1.25rem .35rem;padding:.85rem 1rem;max-width:90%;}
+.busr{background:linear-gradient(135deg,var(--dl),var(--dl));border-radius:1.25rem 1.25rem .35rem 1.25rem;padding:.85rem 1rem;max-width:88%;align-self:flex-end;}
+.cqrow{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.65rem;}
+.cqb{padding:.35rem .8rem;background:rgba(201,149,14,.10);border:1px solid rgba(201,149,14,.26);border-radius:9999px;color:var(--gold);font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .22s;}
+.cqb:hover{background:rgba(201,149,14,.26);}
+.cinput-row{padding:.85rem 1rem;border-top:1px solid rgba(201,149,14,.10);display:flex;gap:.55rem;}
+.ctxt{flex:1;background:rgba(45,16,80,.35);border:1px solid rgba(201,149,14,.22);border-radius:9999px;color:var(--txt);padding:.6rem 1rem;font-size:.82rem;outline:none;font-family:'Inter',sans-serif;transition:border-color .3s;}
+.ctxt:focus{border-color:var(--gold);}
+.ctxt::placeholder{color:var(--muted);}
+.csend{width:38px;height:38px;min-width:38px;background:var(--gold);border:none;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;}
+.csend:hover{transform:scale(1.1);background:var(--glit);}
+
+/* Toast */
+#toastWrap{position:fixed;bottom:7rem;right:1.8rem;z-index:801;display:flex;align-items:flex-end;gap:.65rem;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .45s,transform .45s;}
+#toastWrap.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+.toast-card{background:linear-gradient(135deg,rgba(20,9,32,.97),rgba(45,16,80,.97));border:1px solid rgba(201,149,14,.32);border-radius:1.25rem 1.25rem 0 1.25rem;padding:1rem 1.2rem;backdrop-filter:blur(20px);box-shadow:0 10px 40px rgba(0,0,0,.6);cursor:pointer;max-width:200px;}
+.toast-card p{font-size:.8rem;color:var(--cream);line-height:1.55;}
+.toast-card strong{font-family:'Cinzel',serif;font-size:.72rem;color:var(--gold);}
+.toast-close{display:block;text-align:right;font-size:.65rem;color:var(--muted);margin-top:.4rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+.toast-av{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 0 14px rgba(201,149,14,.5);align-self:flex-end;}
+@keyframes tdot{0%,100%{opacity:.3;transform:translateY(0);}50%{opacity:1;transform:translateY(-3px);}}
+.tdot{display:inline-block;width:5px;height:5px;background:var(--gold);border-radius:50%;animation:tdot .9s infinite;}
+.tdot:nth-child(2){animation-delay:.18s;}
+.tdot:nth-child(3){animation-delay:.36s;}
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden"><filter id="nf"><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
+<div class="noise"></div>
+
+<!-- HEADER -->
+<header style="position:fixed;top:0;left:0;right:0;z-index:200;padding:1.3rem 2rem;">
+  <div class="hpill" id="hpill" style="max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.4rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="cinzel" style="font-size:.62rem;font-weight:700;color:var(--void);">A33</span>
+      </div>
+      <span class="cinzel" style="font-size:.9rem;font-weight:700;color:var(--gold);letter-spacing:.12em;">ALQUIMIA33</span>
+    </div>
+    <nav style="display:flex;gap:2rem;align-items:center;">
+      <a href="#cervezas" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Cervezas</a>
+      <a href="#proceso" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Proceso</a>
+      <a href="#truck" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">El Truck</a>
+      <a href="#" onclick="openChat();return false;" class="mag cinzel" style="font-size:.7rem;font-weight:700;border:1px solid var(--gold);color:var(--gold);padding:.5rem 1.25rem;border-radius:9999px;text-decoration:none;display:inline-block;letter-spacing:.1em;">
+        <div class="mf" style="background:var(--gold);"></div>
+        <span style="position:relative;z-index:1;transition:color .4s;">INVOCAR ✦</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════════ HERO — VIDEO + ZOOM ══════════════ -->
+<section id="hero">
+  <!-- Video background -->
+  <video id="heroVideo" autoplay muted playsinline preload="auto">
+    <source src="./Hero.mp4.mp4" type="video/mp4">
+  </video>
+  <div id="heroOverlay"></div>
+  <!-- Black curtain (fades out on load) -->
+  <div id="heroCurtain"></div>
+
+  <!-- Hero content -->
+  <div id="heroContent">
+    <div id="ht0" class="stag" style="margin-bottom:1.5rem;opacity:0;">✦ San Telmo, Buenos Aires · Cerveza Artesanal Premium</div>
+    <h1 style="line-height:.9;margin-bottom:1.5rem;">
+      <div id="ht1" class="cinzel" style="font-size:clamp(.85rem,2vw,1.3rem);font-weight:400;color:var(--cream);letter-spacing:.22em;margin-bottom:.6rem;opacity:0;">DONDE LA</div>
+      <div id="ht2" class="cinzel sg" style="font-size:clamp(3.5rem,10vw,8.5rem);font-weight:900;letter-spacing:.04em;display:block;opacity:0;">ALQUIMIA</div>
+      <div id="ht3" class="corm" style="font-size:clamp(1.3rem,3.5vw,2.8rem);font-style:italic;color:var(--cream);opacity:0;">se convierte en</div>
+      <div id="ht4" class="cinzel" style="font-size:clamp(2.8rem,8vw,7rem);font-weight:900;color:var(--amb);letter-spacing:.07em;opacity:0;">CERVEZA</div>
+    </h1>
+    <p id="ht5" style="font-size:clamp(.85rem,1.6vw,1.05rem);color:rgba(216,207,192,.85);max-width:480px;line-height:1.9;margin:.5rem auto 2.2rem;opacity:0;">
+      Cerveza artesanal premium elaborada con pasión,<br>ingredientes seleccionados y un toque de <em style="color:var(--gold);">magia alquímica.</em>
+    </p>
+    <div id="ht6" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;">
+      <a href="#" onclick="openChat();return false;" class="mag cinzel" style="display:inline-block;font-size:.8rem;font-weight:700;background:var(--gold);color:var(--void);padding:1rem 2.5rem;border-radius:9999px;text-decoration:none;letter-spacing:.1em;">
+        <div class="mf" style="background:var(--glit);"></div>
+        <span>✦ INVOCAR TU EXPERIENCIA</span>
+      </a>
+      <a href="#cervezas" class="mag cinzel" style="display:inline-block;font-size:.8rem;font-weight:600;background:transparent;color:var(--cream);padding:1rem 2rem;border-radius:9999px;text-decoration:none;letter-spacing:.1em;border:1px solid rgba(237,232,222,.3);">
+        <div class="mf" style="background:rgba(255,255,255,.06);"></div>
+        <span>Ver Catálogo</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="scrl">
+    <span class="stag" style="font-size:.56rem;">SCROLL</span>
+    <div style="width:1px;height:42px;background:linear-gradient(to bottom,var(--gold),transparent);"></div>
+  </div>
+</section>
+
+<!-- ══════════════ FEATURES ══════════════ -->
+<section style="padding:8rem 2rem;max-width:1100px;margin:0 auto;">
+  <div class="rv" style="text-align:center;margin-bottom:4.5rem;">
+    <span class="stag">✦ LA ALQUIMIA DETRÁS DE CADA SORBO</span>
+    <h2 class="cinzel" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;color:var(--cream);margin-top:1rem;">Tres Pilares.<br><span class="gg">Una Obsesión.</span></h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+
+    <!-- Card 1: Ingredientes -->
+    <div class="card rv" style="padding:2rem;min-height:400px;">
+      <div class="stag" style="margin-bottom:.9rem;">01 — INGREDIENTES</div>
+      <h3 class="cinzel" style="font-size:1.25rem;color:var(--cream);margin-bottom:.5rem;">Materia Prima</h3>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.7;">Los elementos que despiertan la transmutación.</p>
+      <div id="shufflerWrap" style="position:relative;height:200px;cursor:pointer;" onclick="shuffleCards()">
+        <div class="sc-card sc-c0" id="sc0" style="transform:rotate(-5deg) translateY(14px);z-index:1;">
+          <div class="stag" style="margin-bottom:.6rem;font-size:.6rem;">HIDROMIEL</div>
+          <div style="font-size:1.6rem;margin-bottom:.6rem;color:var(--amb);">⬡</div>
+          <p style="font-size:.78rem;color:rgba(216,207,192,.7);line-height:1.65;">Miel de abejas locales · Levadura especial · Fermentación lenta en frío 21 días</p>
+          <div class="mono" style="font-size:.58rem;color:var(--gold);margin-top:.8rem;opacity:.7;">ABV 7.5% · Sin lúpulo</div>
+        </div>
+        <div class="sc-card sc-c1" id="sc1" style="transform:rotate(-2deg) translateY(7px);z-index:2;">
+          <div class="stag" style="margin-bottom:.6rem;font-size:.6rem;">IPA</div>
+          <div style="font-size:1.6rem;margin-bottom:.6rem;color:#9B72D8;">✦</div>
+          <p style="font-size:.78rem;color:rgba(216,207,192,.7);line-height:1.65;">Lúpulo Citra & Cascade · Cebada malteada · Dry-hop 72hs · Agua filtrada</p>
+          <div class="mono" style="font-size:.58rem;color:var(--gold);margin-top:.8rem;opacity:.7;">ABV 6.2% · IBU 45</div>
+        </div>
+        <div class="sc-card sc-c2" id="sc2" style="transform:rotate(0deg);z-index:3;border-color:rgba(201,149,14,.45);">
+          <div class="stag" style="margin-bottom:.6rem;font-size:.6rem;">GOLDEN</div>
+          <div style="font-size:1.6rem;margin-bottom:.6rem;color:var(--gold);">◈</div>
+          <p style="font-size:.78rem;color:rgba(216,207,192,.85);line-height:1.65;">Malta pálida seleccionada · Lúpulo floral suave · Levadura premium de cepa propia</p>
+          <div class="mono" style="font-size:.58rem;color:var(--gold);margin-top:.8rem;opacity:.7;">ABV 5.0% · IBU 18</div>
+        </div>
+      </div>
+      <p class="mono" style="font-size:.6rem;color:var(--muted);margin-top:.85rem;text-align:center;letter-spacing:.06em;">— presioná para ver cada estilo</p>
+    </div>
+
+    <!-- Card 2: Proceso (Quill) -->
+    <div class="card rv" style="padding:2rem;min-height:400px;">
+      <div class="stag" style="margin-bottom:.9rem;">02 — PROCESO</div>
+      <h3 class="cinzel" style="font-size:1.25rem;color:var(--cream);margin-bottom:.5rem;">El Ritual</h3>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.7;">Cada lote, un acto sagrado de transformación.</p>
+      <div class="parchment" id="parchment">
+        <svg id="quillSvg" width="26" height="68" viewBox="0 0 26 68" xmlns="http://www.w3.org/2000/svg" style="left:0;top:-6px;position:absolute;">
+          <defs>
+            <linearGradient id="quillG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E2B830" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="#C9950E" stop-opacity=".6"/>
+            </linearGradient>
+          </defs>
+          <path d="M13,4 Q26,14 20,34 Q18,40 13,58" stroke="rgba(201,149,14,.3)" stroke-width=".8" fill="none"/>
+          <path d="M13,4 Q0,14 6,34 Q8,40 13,58" stroke="rgba(201,149,14,.22)" stroke-width=".8" fill="none"/>
+          <path d="M13,8 Q21,16 17,26" stroke="rgba(201,149,14,.18)" stroke-width=".5" fill="none"/>
+          <path d="M13,16 Q20,22 16,30" stroke="rgba(201,149,14,.14)" stroke-width=".5" fill="none"/>
+          <path d="M13,8 Q5,16 9,26" stroke="rgba(201,149,14,.18)" stroke-width=".5" fill="none"/>
+          <path d="M13,16 Q6,22 10,30" stroke="rgba(201,149,14,.14)" stroke-width=".5" fill="none"/>
+          <line x1="13" y1="4" x2="13" y2="63" stroke="url(#quillG)" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M13,60 L11,68 L13,65 L15,68 Z" fill="rgba(201,149,14,.65)"/>
+          <circle cx="13" cy="66" r="1.3" fill="rgba(74,30,138,.9)"/>
+          <!-- Ink glow at tip -->
+          <circle cx="13" cy="66" r="2.5" fill="none" stroke="rgba(201,149,14,.25)" stroke-width="1"/>
+        </svg>
+        <div id="quillLines" style="padding-left:.5rem;padding-top:.4rem;min-height:165px;">
+          <div class="quill-line" id="ql0"><span class="sym">⚗</span>El grano despierta en agua tibia...</div>
+          <div class="quill-line" id="ql1"><span class="sym">✦</span>El mosto libera sus azúcares sagrados...</div>
+          <div class="quill-line" id="ql2"><span class="sym">☿</span>La levadura inicia su danza oscura...</div>
+          <div class="quill-line" id="ql3"><span class="sym">⊕</span>El reposo sella el misterio en frío...</div>
+          <div class="quill-line" id="ql4"><span class="sym">★</span>La transmutación está completa.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Experiencia -->
+    <div class="card rv" style="padding:2rem;min-height:400px;">
+      <div class="stag" style="margin-bottom:.9rem;">03 — EXPERIENCIA</div>
+      <h3 class="cinzel" style="font-size:1.25rem;color:var(--cream);margin-bottom:.5rem;">La Alquimia Llega</h3>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.7;">Dónde y cómo encontrarnos.</p>
+      <div id="tapList" style="display:flex;flex-direction:column;gap:.65rem;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FILOSOFÍA ══════════════ -->
+<section style="padding:9rem 2rem;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--void) 0%,var(--dm) 50%,var(--void) 100%);">
+  <div style="position:absolute;inset:0;background-image:url('./WhatsApp Image 2026-05-14 at 09.49.15.jpeg');background-size:cover;background-position:center 40%;opacity:.07;filter:blur(4px);"></div>
+  <div style="position:relative;z-index:1;max-width:1000px;margin:0 auto;">
+    <div class="rv" style="text-align:center;margin-bottom:5rem;"><span class="stag">✦ FILOSOFÍA ALQUÍMICA</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;">
+      <div class="rvl">
+        <p class="mono" style="color:var(--muted);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;margin-bottom:1rem;">La industria masiva</p>
+        <div style="position:relative;display:inline-block;">
+          <h3 class="corm" style="font-size:clamp(2rem,5vw,4rem);font-style:italic;color:rgba(255,255,255,.12);line-height:1.1;">"Cantidad<br>sobre<br>alma"</h3>
+          <div style="position:absolute;top:52%;left:0;right:0;height:2px;background:var(--amb);transform:rotate(-6deg);opacity:.5;"></div>
+        </div>
+        <p style="color:var(--muted);font-size:.84rem;margin-top:1.5rem;line-height:1.85;">Procesos industriales. Sabores estandarizados. Sin historia. Sin identidad.</p>
+      </div>
+      <div class="rvr" style="border-left:1px solid rgba(201,149,14,.25);padding-left:4rem;">
+        <p class="mono" style="color:var(--gold);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;margin-bottom:1rem;">ALQUIMIA33</p>
+        <h3 class="corm gg" style="font-size:clamp(2rem,5vw,4rem);font-style:italic;line-height:1.1;">"Magia<br>en cada<br>sorbo"</h3>
+        <p style="color:var(--txt);font-size:.84rem;margin-top:1.5rem;line-height:1.85;">Cada lote es una obra. Cada sabor, una historia. <em style="color:var(--gold);">Nacida en San Telmo con alma de laboratorio alquímico.</em></p>
+        <div style="margin-top:1.8rem;display:flex;gap:2rem;">
+          <div><div class="cinzel" style="font-size:1.6rem;color:var(--gold);">4</div><div style="font-size:.7rem;color:var(--muted);">Estilos</div></div>
+          <div><div class="cinzel" style="font-size:1.6rem;color:var(--gold);">100%</div><div style="font-size:.7rem;color:var(--muted);">Artesanal</div></div>
+          <div><div class="cinzel" style="font-size:1.6rem;color:var(--gold);">∞</div><div style="font-size:.7rem;color:var(--muted);">Alquimia</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PROTOCOLO ══════════════ -->
+<section id="proceso" style="padding:6rem 2rem;">
+  <div class="rv" style="text-align:center;margin-bottom:4rem;max-width:600px;margin-left:auto;margin-right:auto;">
+    <span class="stag">✦ PROTOCOLO DE ELABORACIÓN</span>
+    <h2 class="cinzel" style="font-size:clamp(2rem,4.5vw,3rem);font-weight:700;color:var(--cream);margin-top:1rem;">De la Malta<br><span class="gg">al Vaso</span></h2>
+  </div>
+  <div style="max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem;">
+    <div class="proto rv" style="padding:2.25rem;display:flex;align-items:center;gap:2rem;">
+      <div style="min-width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;"><span style="font-size:1.3rem;">🌾</span><span class="mono" style="font-size:.48rem;color:var(--void);font-weight:700;margin-top:2px;">01</span></div>
+      <div><h3 class="cinzel" style="font-size:1rem;color:var(--gold);margin-bottom:.4rem;">MALTEADO</h3><p style="color:var(--muted);font-size:.82rem;line-height:1.8;">Cebada premium sometida a germinación controlada. El grano despierta, activa enzimas, libera los azúcares que serán el alma del lote.</p><div class="mono" style="color:rgba(74,30,138,.8);font-size:.6rem;margin-top:.65rem;">5-7 días · 15-20°C</div></div>
+    </div>
+    <div class="proto rv" style="padding:2.25rem;display:flex;align-items:center;gap:2rem;">
+      <div style="min-width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--amb),rgba(184,104,32,.5));display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;"><span style="font-size:1.3rem;">🔥</span><span class="mono" style="font-size:.48rem;color:var(--void);font-weight:700;margin-top:2px;">02</span></div>
+      <div><h3 class="cinzel" style="font-size:1rem;color:var(--gold);margin-bottom:.4rem;">MACERADO</h3><p style="color:var(--muted);font-size:.82rem;line-height:1.8;">Malta molida en agua a temperatura exacta. Las enzimas convierten almidón en azúcares fermentables. El mosto alquímico nace.</p><div class="mono" style="color:rgba(74,30,138,.8);font-size:.6rem;margin-top:.65rem;">65-72°C · 60-90 min</div></div>
+    </div>
+    <div class="proto rv" style="padding:2.25rem;display:flex;align-items:center;gap:2rem;">
+      <div style="min-width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,rgba(74,30,138,.8),var(--dl));display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;"><span style="font-size:1.3rem;">⚗️</span><span class="mono" style="font-size:.48rem;color:var(--cream);font-weight:700;margin-top:2px;">03</span></div>
+      <div><h3 class="cinzel" style="font-size:1rem;color:var(--gold);margin-bottom:.4rem;">FERMENTACIÓN</h3><p style="color:var(--muted);font-size:.82rem;line-height:1.8;">La levadura transforma azúcares en alcohol y CO₂. Materia simple deviene algo vivo. El momento más alquímico del proceso.</p><div class="mono" style="color:rgba(74,30,138,.8);font-size:.6rem;margin-top:.65rem;">7-14 días · 18-22°C</div></div>
+    </div>
+    <div class="proto rv" style="padding:2.25rem;display:flex;align-items:center;gap:2rem;">
+      <div style="min-width:70px;height:70px;border-radius:50%;background:transparent;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;"><span style="font-size:1.3rem;">❄️</span><span class="mono" style="color:var(--gold);font-size:.48rem;font-weight:700;margin-top:2px;">04</span></div>
+      <div><h3 class="cinzel" style="font-size:1rem;color:var(--gold);margin-bottom:.4rem;">GUARDA</h3><p style="color:var(--muted);font-size:.82rem;line-height:1.8;">Reposo en frío. Sabores se integran, el líquido se clarifica, la madurez alquímica se completa. La paciencia es el ingrediente secreto.</p><div class="mono" style="color:rgba(74,30,138,.8);font-size:.6rem;margin-top:.65rem;">0-4°C · 7-21 días</div></div>
+    </div>
+    <div class="proto rv" style="padding:2.25rem;display:flex;align-items:center;gap:2rem;border-color:rgba(201,149,14,.5);">
+      <div style="min-width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--glit));display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;"><span style="font-size:1.3rem;">🍺</span><span class="mono" style="font-size:.48rem;color:var(--void);font-weight:700;margin-top:2px;">05</span></div>
+      <div><h3 class="cinzel" style="font-size:1rem;color:var(--glit);margin-bottom:.4rem;">SERVIDO</h3><p style="color:var(--txt);font-size:.82rem;line-height:1.8;">El resultado de días de ritual llega a tu vaso. Temperatura ideal, espuma perfecta, aroma que anticipa el sabor. La transmutación está completa.</p><div class="mono" style="color:var(--gold);font-size:.6rem;margin-top:.65rem;">✦ 4-8°C según estilo</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CATÁLOGO ══════════════ -->
+<section id="cervezas" style="padding:8rem 2rem;background:linear-gradient(180deg,var(--void) 0%,var(--dm) 50%,var(--void) 100%);">
+  <div class="rv" style="text-align:center;margin-bottom:4rem;">
+    <span class="stag">✦ LOS CUATRO HECHIZOS</span>
+    <h2 class="cinzel" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;color:var(--cream);margin-top:1rem;">Cuatro Estilos.<br><span class="gg">Cuatro Expresiones.</span></h2>
+    <p class="corm" style="color:var(--muted);font-size:1rem;font-style:italic;margin-top:.75rem;">Pasá el cursor para descubrir · Tocá para invocar</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:1100px;margin:0 auto;">
+
+    <!-- GOLDEN -->
+    <div class="bcard rv" style="height:380px;"><div class="bcard-in" style="height:100%;">
+      <div class="bfront card" style="height:100%;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <!-- Símbolo Alquímico: Sol — Rueda Solar Vikinga -->
+        <svg width="72" height="82" viewBox="0 0 72 82" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.8rem;">
+          <circle cx="36" cy="38" r="27" fill="rgba(201,149,14,.05)"/>
+          <circle cx="36" cy="38" r="23" fill="none" stroke="rgba(201,149,14,.28)" stroke-width=".7" stroke-dasharray="2.5,3"/>
+          <circle cx="36" cy="38" r="19.5" fill="none" stroke="rgba(201,149,14,.62)" stroke-width="1.3"/>
+          <line x1="36" y1="17" x2="36" y2="26.5" stroke="#E2B830" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="50.1" y1="24.9" x2="44.5" y2="30.5" stroke="#E2B830" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="57.5" y1="38" x2="48" y2="38" stroke="#E2B830" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="50.1" y1="51.1" x2="44.5" y2="45.5" stroke="#E2B830" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="36" y1="59" x2="36" y2="49.5" stroke="#E2B830" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="21.9" y1="51.1" x2="27.5" y2="45.5" stroke="#E2B830" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="14.5" y1="38" x2="24" y2="38" stroke="#E2B830" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="21.9" y1="24.9" x2="27.5" y2="30.5" stroke="#E2B830" stroke-width="1.8" stroke-linecap="round"/>
+          <polygon points="36,15 33.5,20 38.5,20" fill="rgba(201,149,14,.82)"/>
+          <polygon points="52.2,20.8 47.2,24.8 51.6,27.2" fill="rgba(201,149,14,.68)"/>
+          <polygon points="59.5,38 54.5,35.5 54.5,40.5" fill="rgba(201,149,14,.82)"/>
+          <polygon points="52.2,55.2 47.2,51.2 51.6,48.8" fill="rgba(201,149,14,.68)"/>
+          <polygon points="36,61 33.5,56 38.5,56" fill="rgba(201,149,14,.82)"/>
+          <polygon points="19.8,55.2 24.8,51.2 20.4,48.8" fill="rgba(201,149,14,.68)"/>
+          <polygon points="12.5,38 17.5,35.5 17.5,40.5" fill="rgba(201,149,14,.82)"/>
+          <polygon points="19.8,20.8 24.8,24.8 20.4,27.2" fill="rgba(201,149,14,.68)"/>
+          <circle cx="36" cy="38" r="11" fill="rgba(9,7,15,.55)" stroke="rgba(201,149,14,.52)" stroke-width="1"/>
+          <circle cx="36" cy="38" r="5.5" fill="rgba(201,149,14,.88)"/>
+          <circle cx="36" cy="38" r="2.5" fill="#F5D060"/>
+          <ellipse cx="36" cy="74" rx="16" ry="3" fill="rgba(201,149,14,.14)"/>
+        </svg>
+        <div class="stag" style="margin-bottom:.5rem;">GOLDEN</div>
+        <h3 class="cinzel" style="font-size:1.3rem;color:var(--gold);margin-bottom:.7rem;">La Clásica</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;">Suave, dorada y balanceada. El clásico que nunca falla.</p>
+        <div style="margin-top:1.2rem;padding:.4rem 1rem;background:rgba(201,149,14,.1);border:1px solid rgba(201,149,14,.28);border-radius:9999px;"><span class="mono" style="font-size:.6rem;color:var(--gold);">IBU 18 · ABV 5.0%</span></div>
+      </div>
+      <div class="bback" style="background:linear-gradient(135deg,rgba(201,149,14,.82),rgba(184,104,32,.68));border-radius:1.75rem;">
+        <h3 class="cinzel" style="font-size:1.05rem;color:var(--void);font-weight:800;margin-bottom:.85rem;">GOLDEN ALE</h3>
+        <p style="font-size:.8rem;color:rgba(9,7,15,.8);line-height:1.65;margin-bottom:1.5rem;">Malta pálida · Lúpulo floral · Levadura neutra. La puerta de entrada al mundo Alquimia33.</p>
+        <a href="#" onclick="openChat();sendQ('Quiero pedir la Golden');return false;" style="background:var(--void);color:var(--gold);padding:.65rem 1.6rem;border-radius:9999px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;text-decoration:none;letter-spacing:.1em;">PEDIR AHORA</a>
+      </div>
+    </div></div>
+
+    <!-- IPA -->
+    <div class="bcard rv" style="height:380px;"><div class="bcard-in" style="height:100%;">
+      <div class="bfront card" style="height:100%;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <!-- Símbolo Alquímico: Azufre — △ Tribal sobre Cruz -->
+        <svg width="72" height="82" viewBox="0 0 72 82" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.8rem;">
+          <circle cx="36" cy="36" r="26" fill="rgba(74,30,138,.05)" stroke="rgba(100,55,190,.28)" stroke-width=".8" stroke-dasharray="2,4"/>
+          <polygon points="36,6 60,51 12,51" fill="rgba(74,30,138,.08)" stroke="rgba(120,70,210,.78)" stroke-width="1.7" stroke-linejoin="round"/>
+          <polygon points="36,14 54,47 18,47" fill="none" stroke="rgba(120,70,210,.3)" stroke-width=".9" stroke-linejoin="round"/>
+          <circle cx="36" cy="35" r="8.5" fill="none" stroke="rgba(130,75,215,.55)" stroke-width="1.1"/>
+          <circle cx="36" cy="35" r="3.5" fill="rgba(120,70,210,.65)"/>
+          <circle cx="36" cy="6" r="3" fill="rgba(130,75,215,.8)"/>
+          <circle cx="12" cy="51" r="2.2" fill="rgba(120,70,210,.65)"/>
+          <circle cx="60" cy="51" r="2.2" fill="rgba(120,70,210,.65)"/>
+          <line x1="36" y1="51" x2="36" y2="74" stroke="rgba(130,75,215,.72)" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="22" y1="62" x2="50" y2="62" stroke="rgba(130,75,215,.72)" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="22" y1="59.5" x2="22" y2="64.5" stroke="rgba(130,75,215,.5)" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="50" y1="59.5" x2="50" y2="64.5" stroke="rgba(130,75,215,.5)" stroke-width="1.3" stroke-linecap="round"/>
+          <ellipse cx="36" cy="78" rx="14" ry="2.5" fill="rgba(100,50,180,.14)"/>
+        </svg>
+        <div class="stag" style="margin-bottom:.5rem;">IPA</div>
+        <h3 class="cinzel" style="font-size:1.3rem;color:var(--gold);margin-bottom:.7rem;">La Intensa</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;">Intensa, aromática y llena de carácter. Para los valientes.</p>
+        <div style="margin-top:1.2rem;padding:.4rem 1rem;background:rgba(74,30,138,.2);border:1px solid rgba(74,30,138,.45);border-radius:9999px;"><span class="mono" style="font-size:.6rem;color:#9B72D8;">IBU 45 · ABV 6.2%</span></div>
+      </div>
+      <div class="bback" style="background:linear-gradient(135deg,rgba(74,30,138,.9),var(--dp));border-radius:1.75rem;">
+        <h3 class="cinzel" style="font-size:1.05rem;color:var(--gold);font-weight:800;margin-bottom:.85rem;">INDIA PALE ALE</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1.5rem;">Dry-hopped con Citra & Cascade. Cítricas y resinosas. Amargor elegante, final largo.</p>
+        <a href="#" onclick="openChat();sendQ('Quiero pedir la IPA');return false;" style="background:var(--gold);color:var(--void);padding:.65rem 1.6rem;border-radius:9999px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;text-decoration:none;letter-spacing:.1em;">PEDIR AHORA</a>
+      </div>
+    </div></div>
+
+    <!-- HIDROMIEL -->
+    <div class="bcard rv" style="height:380px;"><div class="bcard-in" style="height:100%;">
+      <div class="bfront card" style="height:100%;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <!-- Símbolo Alquímico: Trefoil — Triple Nudo Celta/Vikingo -->
+        <svg width="72" height="82" viewBox="0 0 72 82" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.8rem;">
+          <circle cx="36" cy="40" r="26" fill="rgba(184,104,32,.05)" stroke="rgba(184,104,32,.4)" stroke-width=".9" stroke-dasharray="3,3.5"/>
+          <circle cx="36" cy="25" r="14" fill="rgba(184,104,32,.04)" stroke="rgba(201,149,14,.68)" stroke-width="1.4"/>
+          <circle cx="23.9" cy="46.5" r="14" fill="rgba(184,104,32,.04)" stroke="rgba(201,149,14,.68)" stroke-width="1.4"/>
+          <circle cx="48.1" cy="46.5" r="14" fill="rgba(184,104,32,.04)" stroke="rgba(201,149,14,.68)" stroke-width="1.4"/>
+          <polygon points="36,25 23.9,46.5 48.1,46.5" fill="none" stroke="rgba(201,149,14,.28)" stroke-width=".9" stroke-dasharray="2.5,3" stroke-linejoin="round"/>
+          <circle cx="36" cy="39.3" r="6.5" fill="rgba(184,104,32,.22)" stroke="rgba(201,149,14,.5)" stroke-width="1"/>
+          <circle cx="36" cy="39.3" r="3" fill="rgba(201,149,14,.82)"/>
+          <circle cx="36" cy="11" r="2.2" fill="rgba(201,149,14,.72)"/>
+          <circle cx="10.2" cy="60" r="2.2" fill="rgba(201,149,14,.72)"/>
+          <circle cx="61.8" cy="60" r="2.2" fill="rgba(201,149,14,.72)"/>
+          <ellipse cx="36" cy="74" rx="16" ry="3" fill="rgba(184,104,32,.14)"/>
+        </svg>
+        <div class="stag" style="margin-bottom:.5rem;">HIDROMIEL</div>
+        <h3 class="cinzel" style="font-size:1.3rem;color:var(--gold);margin-bottom:.7rem;">La Ancestral</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;">Dulce, mística y ancestral. El néctar de los dioses.</p>
+        <div style="margin-top:1.2rem;padding:.4rem 1rem;background:rgba(184,104,32,.18);border:1px solid rgba(184,104,32,.35);border-radius:9999px;"><span class="mono" style="font-size:.6rem;color:var(--amb);">IBU 0 · ABV 7.5%</span></div>
+      </div>
+      <div class="bback" style="background:linear-gradient(135deg,rgba(184,104,32,.58),rgba(201,149,14,.42));border-radius:1.75rem;">
+        <h3 class="cinzel" style="font-size:1.05rem;color:var(--void);font-weight:800;margin-bottom:.85rem;">HIDROMIEL ARTESANAL</h3>
+        <p style="font-size:.8rem;color:rgba(9,7,15,.8);line-height:1.65;margin-bottom:1.5rem;">Miel de abejas locales + levadura especial. Fermentado en frío 21 días. Milenario.</p>
+        <a href="#" onclick="openChat();sendQ('Quiero pedir el Hidromiel');return false;" style="background:var(--void);color:var(--gold);padding:.65rem 1.6rem;border-radius:9999px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;text-decoration:none;letter-spacing:.1em;">PEDIR AHORA</a>
+      </div>
+    </div></div>
+
+    <!-- 0 ALCOHOL -->
+    <div class="bcard rv" style="height:380px;"><div class="bcard-in" style="height:100%;">
+      <div class="bfront card" style="height:100%;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <!-- Símbolo Alquímico: Mercurio ☿ — Círculo, Cuernos, Cruz -->
+        <svg width="72" height="82" viewBox="0 0 72 82" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.8rem;">
+          <circle cx="36" cy="32" r="26" fill="rgba(150,200,240,.04)" stroke="rgba(150,200,240,.25)" stroke-width=".7" stroke-dasharray="2,4"/>
+          <circle cx="36" cy="32" r="14" fill="rgba(150,200,240,.06)" stroke="rgba(150,200,240,.65)" stroke-width="1.5"/>
+          <circle cx="36" cy="32" r="8" fill="none" stroke="rgba(150,200,240,.28)" stroke-width=".9"/>
+          <circle cx="36" cy="32" r="3.5" fill="rgba(150,200,240,.72)"/>
+          <path d="M 22 26 A 16 16 0 0 1 50 26" fill="none" stroke="rgba(170,215,250,.85)" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="22" cy="26" r="2.5" fill="rgba(150,200,240,.75)"/>
+          <circle cx="50" cy="26" r="2.5" fill="rgba(150,200,240,.75)"/>
+          <line x1="36" y1="46" x2="36" y2="70" stroke="rgba(150,200,240,.68)" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="23" y1="57" x2="49" y2="57" stroke="rgba(150,200,240,.68)" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="23" cy="57" r="2" fill="rgba(150,200,240,.55)"/>
+          <circle cx="49" cy="57" r="2" fill="rgba(150,200,240,.55)"/>
+          <circle cx="36" cy="70" r="2" fill="rgba(150,200,240,.55)"/>
+          <ellipse cx="36" cy="76" rx="14" ry="2.5" fill="rgba(150,200,240,.12)"/>
+        </svg>
+        <div class="stag" style="margin-bottom:.5rem;">0 ALCOHOL</div>
+        <h3 class="cinzel" style="font-size:1.3rem;color:var(--gold);margin-bottom:.7rem;">La Libre</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;">Todo el sabor artesanal, sin alcohol. La alquimia sin límites.</p>
+        <div style="margin-top:1.2rem;padding:.4rem 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:9999px;"><span class="mono" style="font-size:.6rem;color:var(--muted);">IBU 12 · ABV 0.0%</span></div>
+      </div>
+      <div class="bback" style="background:linear-gradient(135deg,rgba(237,232,222,.1),rgba(20,9,32,.97));border-radius:1.75rem;">
+        <h3 class="cinzel" style="font-size:1.05rem;color:var(--cream);font-weight:800;margin-bottom:.85rem;">CERO ALCOHOL</h3>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1.5rem;">Desalcoholización artesanal. Sabor completo, cuerpo real. Sin compromiso.</p>
+        <a href="#" onclick="openChat();sendQ('Quiero pedir la 0 Alcohol');return false;" style="background:var(--gold);color:var(--void);padding:.65rem 1.6rem;border-radius:9999px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;text-decoration:none;letter-spacing:.1em;">PEDIR AHORA</a>
+      </div>
+    </div></div>
+
+  </div>
+  <div class="rv" style="text-align:center;margin-top:3.5rem;">
+    <div style="display:inline-flex;gap:2rem;padding:1.5rem 3rem;background:rgba(30,11,48,.4);border:1px solid rgba(201,149,14,.18);border-radius:2rem;backdrop-filter:blur(20px);flex-wrap:wrap;justify-content:center;">
+      <div style="text-align:center;"><div class="stag" style="margin-bottom:.3rem;">BOTELLA</div><div class="cinzel" style="font-size:1.3rem;color:var(--cream);">330ml</div><div style="font-size:.73rem;color:var(--muted);">Para llevar</div></div>
+      <div style="width:1px;background:rgba(201,149,14,.15);"></div>
+      <div style="text-align:center;"><div class="stag" style="margin-bottom:.3rem;">BARRIL</div><div class="cinzel" style="font-size:1.3rem;color:var(--cream);">20L / 50L</div><div style="font-size:.73rem;color:var(--muted);">Para eventos</div></div>
+      <div style="width:1px;background:rgba(201,149,14,.15);"></div>
+      <div style="text-align:center;"><div class="stag" style="margin-bottom:.3rem;">TRUCK</div><div class="cinzel" style="font-size:1.3rem;color:var(--cream);">Eventos</div><div style="font-size:.73rem;color:var(--muted);">A domicilio</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ EL TRUCK — GENTE + CALIDEZ ══════════════ -->
+<section id="truck" style="padding:8rem 2rem;background:var(--void);">
+  <div class="rv" style="text-align:center;margin-bottom:5rem;">
+    <span class="stag">✦ EL TRUCK ALQUÍMICO</span>
+    <h2 class="cinzel" style="font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;color:var(--cream);margin-top:1rem;">La Alquimia<br><span class="gg">llega a tu evento</span></h2>
+    <p style="color:rgba(216,207,192,.7);font-size:.9rem;line-height:1.85;max-width:480px;margin:.8rem auto 0;">Setup completo con choperas, los 4 estilos y una experiencia única. CABA y GBA.</p>
+  </div>
+
+  <!-- People photos grid -->
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:1.2rem;">
+      <div class="people-photo rv" style="grid-column:span 2;" onclick="openChat();sendQ('Quiero reservar el truck para mi evento')">
+        <img src="https://images.unsplash.com/photo-1543269664-56d93c1b41a6?auto=format&fit=crop&w=900&q=80" alt="Amigos con cervezas Alquimia33" loading="lazy"/>
+        <div class="people-photo-overlay"></div>
+        <div style="position:absolute;bottom:1.5rem;left:1.5rem;">
+          <div class="stag" style="font-size:.6rem;">💍 CASAMIENTOS & EVENTOS</div>
+          <p style="font-size:.82rem;color:var(--cream);margin-top:.3rem;font-weight:500;">Momentos que no se olvidan</p>
+        </div>
+      </div>
+      <div class="people-photo rv" onclick="openChat();sendQ('Quiero reservar el truck para mi evento')">
+        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=500&q=80" alt="Celebración con cerveza artesanal" loading="lazy"/>
+        <div class="people-photo-overlay"></div>
+        <div style="position:absolute;bottom:1.5rem;left:1.2rem;">
+          <div class="stag" style="font-size:.6rem;">🎂 CUMPLEAÑOS</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;">
+      <div class="people-photo rv" onclick="openChat();sendQ('Quiero reservar el truck para mi evento')">
+        <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=500&q=80" alt="Amigos brindando con cerveza artesanal" loading="lazy"/>
+        <div class="people-photo-overlay"></div>
+        <div style="position:absolute;bottom:1.5rem;left:1.2rem;">
+          <div class="stag" style="font-size:.6rem;">🥂 BRINDIS</div>
+        </div>
+      </div>
+      <div class="people-photo rv" onclick="openChat();sendQ('Quiero reservar el truck para mi evento')">
+        <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=500&q=80" alt="Cervezas artesanales premium" loading="lazy"/>
+        <div class="people-photo-overlay"></div>
+        <div style="position:absolute;bottom:1.5rem;left:1.2rem;">
+          <div class="stag" style="font-size:.6rem;">🍺 ARTESANAL</div>
+        </div>
+      </div>
+      <div class="people-photo rv" onclick="openChat();sendQ('Quiero reservar el truck para mi evento')">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=80" alt="Evento privado con el truck Alquimia33" loading="lazy"/>
+        <div class="people-photo-overlay"></div>
+        <div style="position:absolute;bottom:1.5rem;left:1.2rem;">
+          <div class="stag" style="font-size:.6rem;">🏢 CORPORATIVOS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="rv" style="text-align:center;margin-top:3.5rem;">
+      <a href="#" onclick="openChat();sendQ('Quiero contratar el truck para un evento');return false;"
+         class="mag cinzel" style="display:inline-block;font-size:.85rem;font-weight:700;background:var(--gold);color:var(--void);padding:1.2rem 3rem;border-radius:9999px;text-decoration:none;letter-spacing:.1em;box-shadow:0 8px 32px rgba(201,149,14,.3);">
+        <div class="mf" style="background:var(--amb);"></div>
+        <span>RESERVAR EL TRUCK ✦</span>
+      </a>
+      <div style="margin-top:1.4rem;display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:.55rem;"><div class="pdot" style="width:6px;height:6px;background:var(--grn);border-radius:50%;flex-shrink:0;"></div><span style="font-size:.78rem;color:var(--muted);">CABA y Gran Buenos Aires</span></div>
+        <div style="display:flex;align-items:center;gap:.55rem;"><div style="width:6px;height:6px;background:var(--gold);border-radius:50%;flex-shrink:0;"></div><span style="font-size:.78rem;color:var(--muted);">Setup completo incluido</span></div>
+        <div style="display:flex;align-items:center;gap:.55rem;"><div style="width:6px;height:6px;background:var(--amb);border-radius:50%;flex-shrink:0;"></div><span style="font-size:.78rem;color:var(--muted);">4 estilos en chopera</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="ftr" style="padding:4.5rem 2rem 2rem;margin-top:0;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;">
+      <div>
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;"><span class="cinzel" style="font-size:.72rem;font-weight:700;color:var(--void);">A33</span></div>
+          <span class="cinzel" style="font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:.08em;">ALQUIMIA33</span>
+        </div>
+        <p style="color:var(--muted);font-size:.8rem;line-height:1.85;max-width:220px;">Cerveza artesanal premium desde San Telmo, Buenos Aires. Donde la alquimia se convierte en cerveza.</p>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:1.5rem;">
+          <div class="pdot" style="width:7px;height:7px;background:var(--grn);border-radius:50%;"></div>
+          <span class="mono" style="font-size:.6rem;color:var(--muted);">Elaboración activa · San Telmo, CABA</span>
+        </div>
+      </div>
+      <div><h4 class="cinzel" style="font-size:.76rem;color:var(--gold);letter-spacing:.12em;margin-bottom:1.2rem;">CERVEZAS</h4><div style="display:flex;flex-direction:column;gap:.6rem;"><a href="#cervezas" class="fl">Golden</a><a href="#cervezas" class="fl">IPA</a><a href="#cervezas" class="fl">Hidromiel</a><a href="#cervezas" class="fl">0 Alcohol</a></div></div>
+      <div><h4 class="cinzel" style="font-size:.76rem;color:var(--gold);letter-spacing:.12em;margin-bottom:1.2rem;">SERVICIOS</h4><div style="display:flex;flex-direction:column;gap:.6rem;"><a href="#" onclick="openChat();return false;" class="fl">Botellas 330ml</a><a href="#" onclick="openChat();return false;" class="fl">Barriles 20L/50L</a><a href="#truck" class="fl">El Truck</a><a href="#" onclick="openChat();return false;" class="fl">Experiencias</a></div></div>
+      <div><h4 class="cinzel" style="font-size:.76rem;color:var(--gold);letter-spacing:.12em;margin-bottom:1.2rem;">CONTACTO</h4><div style="display:flex;flex-direction:column;gap:.6rem;"><a href="https://wa.me/5491100000000" target="_blank" class="fl">WhatsApp</a><a href="#" class="fl">Instagram</a><a href="#" class="fl">Facebook</a><span class="fl" style="cursor:default;">San Telmo · CABA</span></div></div>
+    </div>
+    <div style="border-top:1px solid rgba(201,149,14,.1);padding-top:1.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <span class="mono" style="font-size:.6rem;color:var(--muted);">© 2025 ALQUIMIA33 Craft Beer. Todos los derechos reservados.</span>
+      <span class="mono" style="font-size:.6rem;color:var(--muted);">Beber con moderación. Prohibida la venta a menores de 18 años.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════ TOAST ══════════════ -->
+<div id="toastWrap">
+  <div class="toast-card" onclick="openChat();hideToast();">
+    <strong>✦ EL ALQUIMISTA TE ESPERA</strong>
+    <p style="margin-top:.4rem;">Hablá con un alquimista y descubrí tu próxima experiencia.</p>
+    <span class="toast-close">tocar para abrir →</span>
+  </div>
+</div>
+
+<!-- ══════════════ FLOATING — VASO + CHAT ══════════════ -->
+<div id="floatBot">
+  <div id="chatLabel">Hablá con un Alquimista</div>
+
+  <!-- Chat panel -->
+  <div id="chatPanel">
+    <div class="chat-hdr">
+      <div class="chat-av">⚗️</div>
+      <div>
+        <div class="cinzel" style="font-size:.86rem;color:var(--gold);font-weight:700;">OSVALDO</div>
+        <div class="mono" style="font-size:.56rem;color:var(--amb);margin-top:1px;">Alquimista · Asesor de Brebajes Mágicos</div>
+        <div style="display:flex;align-items:center;gap:.38rem;margin-top:3px;">
+          <div class="pdot" style="width:5px;height:5px;background:var(--grn);border-radius:50%;"></div>
+          <span class="mono" style="font-size:.56rem;color:var(--muted);">En línea · Responde al instante</span>
+        </div>
+      </div>
+      <button onclick="closeChat()" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.05rem;padding:.2rem .4rem;" onmouseover="this.style.color='var(--cream)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="cinput-row">
+      <input type="text" class="ctxt" id="chatInput" placeholder="Escribí tu consulta..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="csend" onclick="sendMsg()">→</button>
+    </div>
+  </div>
+
+  <!-- VASO DE CERVEZA SVG -->
+  <div id="vasoBtn" onclick="toggleChat()">
+    <svg id="glassSvg" width="56" height="100" viewBox="0 0 56 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="beerLiq" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#D4960A" stop-opacity=".92"/>
+          <stop offset="60%" stop-color="#B86820" stop-opacity=".95"/>
+          <stop offset="100%" stop-color="#7A3C08" stop-opacity=".98"/>
+        </linearGradient>
+        <linearGradient id="glassFace" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(255,255,255,.18)"/>
+          <stop offset="18%" stop-color="rgba(255,255,255,.05)"/>
+          <stop offset="82%" stop-color="rgba(255,255,255,.02)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,.12)"/>
+        </linearGradient>
+        <clipPath id="glassCut">
+          <path d="M8,6 L48,6 L43,89 Q28,94 13,89 Z"/>
+        </clipPath>
+        <filter id="glowF"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- Glass wall -->
+      <path d="M6,4 L50,4 L45,91 Q28,97 11,91 Z" fill="rgba(9,7,15,.68)" stroke="rgba(201,149,14,.58)" stroke-width="1.5"/>
+      <!-- Beer fill + foam (scroll-controlled) -->
+      <g clip-path="url(#glassCut)">
+        <rect id="beerFill" x="6" y="45" width="42" height="48" fill="url(#beerLiq)"/>
+        <!-- Foam -->
+        <ellipse id="foamEll" cx="28" cy="45" rx="18" ry="5.5" fill="rgba(237,232,222,.92)"/>
+        <ellipse id="fb1" cx="20" cy="41" rx="5.5" ry="4.5" fill="rgba(237,232,222,.78)"/>
+        <ellipse id="fb2" cx="29" cy="39" rx="5" ry="4" fill="rgba(240,236,218,.85)"/>
+        <ellipse id="fb3" cx="37" cy="42" rx="5.5" ry="4.2" fill="rgba(235,228,210,.72)"/>
+      </g>
+      <!-- Glass surface overlay -->
+      <path d="M6,4 L50,4 L45,91 Q28,97 11,91 Z" fill="url(#glassFace)"/>
+      <!-- Rim -->
+      <path d="M6,4 L50,4" stroke="rgba(201,149,14,.82)" stroke-width="2.8" stroke-linecap="round"/>
+      <!-- Left reflection stripe -->
+      <path d="M13,8 L11,84" stroke="rgba(255,255,255,.38)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M17,8 L15,50" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-linecap="round"/>
+      <!-- Right subtle reflection -->
+      <path d="M43,8 L41,84" stroke="rgba(255,255,255,.08)" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Condensation drops -->
+      <ellipse cx="22" cy="60" rx="1.6" ry="2.3" fill="rgba(255,255,255,.28)"/>
+      <ellipse cx="38" cy="50" rx="1.2" ry="1.8" fill="rgba(255,255,255,.22)"/>
+      <ellipse cx="30" cy="74" rx="1.4" ry="2.1" fill="rgba(255,255,255,.18)"/>
+      <ellipse cx="40" cy="70" rx="1" ry="1.5" fill="rgba(255,255,255,.15)"/>
+      <!-- A33 text -->
+      <text x="28" y="82" text-anchor="middle" font-size="5.5" fill="rgba(201,149,14,.62)" font-family="Cinzel,serif" font-weight="700">A33</text>
+      <!-- Base glow -->
+      <ellipse cx="28" cy="93" rx="16" ry="3.5" fill="rgba(201,149,14,.22)" filter="url(#glowF)"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script>
+// ─── HEADER SCROLL ───
+window.addEventListener('scroll',()=>document.getElementById('hpill').classList.toggle('sc',scrollY>60));
+
+// ─── HERO VIDEO ZOOM-IN ───
+window.addEventListener('load',()=>{
+  const vid=document.getElementById('heroVideo');
+  const curtain=document.getElementById('heroCurtain');
+  // Start zoomed in, zoom back — cinematic entry
+  gsap.set(vid,{scale:1.12,filter:'blur(6px)'});
+  gsap.set(curtain,{opacity:1});
+  const tl=gsap.timeline();
+  tl.to(curtain,{opacity:0,duration:.8,delay:.3,ease:'power2.out'})
+    .to(vid,{scale:1,filter:'blur(0px)',duration:2.8,ease:'power2.out'},'-=.6')
+    .call(showHeroText);
+});
+
+function showHeroText(){
+  gsap.set(['#ht0','#ht1','#ht2','#ht3','#ht4','#ht5','#ht6'],{y:55});
+  const tl=gsap.timeline();
+  tl.to('#ht0',{opacity:1,y:0,duration:.7,ease:'power3.out'})
+    .to('#ht1',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.3')
+    .to('#ht2',{opacity:1,y:0,duration:1.1,ease:'power3.out'},'-=.5')
+    .to('#ht3',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.5')
+    .to('#ht4',{opacity:1,y:0,duration:1.0,ease:'power3.out'},'-=.5')
+    .to('#ht5',{opacity:1,y:0,duration:.9,ease:'power3.out'},'-=.4')
+    .to('#ht6',{opacity:1,y:0,duration:.8,ease:'power3.out'},'-=.5');
+  setTimeout(()=>document.getElementById('vasoBtn').classList.add('pulsing'),4000);
+}
+
+// ─── SCROLL REVEAL ───
+const rvObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');rvObs.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.rv,.rvl,.rvr').forEach(el=>rvObs.observe(el));
+
+// ─── BEER GLASS SCROLL FILL ───
+function updateGlass(){
+  const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+  const pct=window.scrollY/maxScroll;
+  const level=1-pct; // 1=full top, 0=empty bottom
+  const glassTop=6,glassBot=89,foamH=15;
+  const availH=glassBot-glassTop-foamH;
+  const beerY=glassTop+foamH+availH*(1-level);
+  const beerH=Math.max(0,glassBot-beerY);
+  const bf=document.getElementById('beerFill');
+  const fe=document.getElementById('foamEll');
+  const fb1=document.getElementById('fb1');
+  const fb2=document.getElementById('fb2');
+  const fb3=document.getElementById('fb3');
+  if(bf){bf.setAttribute('y',beerY);bf.setAttribute('height',beerH);}
+  if(fe){fe.setAttribute('cy',beerY+4);}
+  if(fb1){fb1.setAttribute('cy',beerY+1);}
+  if(fb2){fb2.setAttribute('cy',beerY-1);}
+  if(fb3){fb3.setAttribute('cy',beerY+2);}
+  const foamOp=Math.min(1,level*2.5);
+  [fe,fb1,fb2,fb3].forEach(el=>{if(el)el.style.opacity=foamOp;});
+}
+window.addEventListener('scroll',updateGlass,{passive:true});
+updateGlass();
+
+// ─── CARD SHUFFLER ───
+let ci=2;
+const scIds=['sc0','sc1','sc2'];
+function shuffleCards(){
+  ci=(ci+1)%3;
+  const cfgs=[{r:-5,y:14,z:1},{r:-2,y:7,z:2},{r:0,y:0,z:3}];
+  scIds.forEach((id,i)=>{
+    const offset=(i-ci+3)%3;
+    const c=cfgs[offset];
+    const el=document.getElementById(id);
+    el.style.transform=`rotate(${c.r}deg) translateY(${c.y}px)`;
+    el.style.zIndex=c.z;
+  });
+}
+
+// ─── QUILL ANIMATION ───
+const qLines=[
+  {id:'ql0',delay:0},{id:'ql1',delay:1000},{id:'ql2',delay:2050},{id:'ql3',delay:3100},{id:'ql4',delay:4150}
+];
+function startQuillAnimation(){
+  const quill=document.getElementById('quillSvg');
+  const parch=document.getElementById('parchment');
+  if(!parch||!quill)return;
+  qLines.forEach((item)=>{
+    setTimeout(()=>{
+      const lineEl=document.getElementById(item.id);
+      if(!lineEl)return;
+      const lineTop=lineEl.offsetTop;
+      quill.style.top=(lineTop-4)+'px';
+      quill.style.left='0px';
+      gsap.fromTo(quill,{left:0},{left:'calc(100% - 30px)',duration:.75,ease:'none',
+        onComplete:()=>gsap.to(quill,{left:0,duration:0})});
+      setTimeout(()=>lineEl.classList.add('written'),180);
+    },item.delay);
+  });
+  setTimeout(()=>{
+    qLines.forEach(item=>{const el=document.getElementById(item.id);if(el)el.classList.remove('written');});
+    setTimeout(startQuillAnimation,900);
+  },6200);
+}
+const quillObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){startQuillAnimation();quillObs.unobserve(e.target);}});},{threshold:.3});
+const parchEl=document.querySelector('#parchment');
+if(parchEl)quillObs.observe(parchEl);
+
+// ─── TAP LIST ───
+const tapData=[
+  {ic:'🚚',t:'El Truck en tu evento',s:'Casamientos · Empresas · Fiestas'},
+  {ic:'📦',t:'Delivery a domicilio',s:'CABA y GBA · Mismo día'},
+  {ic:'🪣',t:'Barriles para eventos',s:'20L · 50L · Con canilla'},
+  {ic:'🎯',t:'Experiencias guiadas',s:'Catas · Maridajes · Visitas'},
+  {ic:'💬',t:'Pedido por WhatsApp',s:'Respuesta inmediata · 24/7'},
+];
+function renderTapList(){
+  const c=document.getElementById('tapList');
+  if(!c||c.children.length)return;
+  tapData.forEach((item,i)=>{
+    const el=document.createElement('div');
+    el.className='titem';
+    el.style.cssText=`opacity:0;transform:translateX(-14px);transition:all .45s cubic-bezier(.16,1,.3,1);transition-delay:${i*.08}s;`;
+    el.innerHTML=`<span style="font-size:1.1rem;flex-shrink:0;">${item.ic}</span><div><div style="font-size:.82rem;color:var(--cream);font-weight:500;">${item.t}</div><div class="mono" style="font-size:.58rem;color:var(--muted);margin-top:1px;">${item.s}</div></div><span style="margin-left:auto;color:var(--gold);font-size:.78rem;">→</span>`;
+    el.onclick=()=>sendQ(`Me interesa: ${item.t}`);
+    c.appendChild(el);
+    requestAnimationFrame(()=>setTimeout(()=>{el.style.opacity='1';el.style.transform='translateX(0)';},80+i*90));
+  });
+}
+const tlObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){renderTapList();tlObs.unobserve(e.target);}});},{threshold:.2});
+const tapEl=document.getElementById('tapList');
+if(tapEl)tlObs.observe(tapEl);
+
+// ─── CHATBOT ───
+let chatOpen=false;
+function toggleChat(){chatOpen?closeChat():openChat();}
+function openChat(){
+  if(chatOpen)return;chatOpen=true;
+  document.getElementById('chatPanel').classList.add('open');
+  hideToast();
+  if(!document.getElementById('chatMsgs').children.length)initBot();
+}
+function closeChat(){chatOpen=false;document.getElementById('chatPanel').classList.remove('open');}
+
+// ─── TOAST (auto-hide 5s) ───
+function showToast(){
+  if(chatOpen)return;
+  const tw=document.getElementById('toastWrap');
+  tw.classList.add('show');
+  clearTimeout(window._toastHide);
+  window._toastHide=setTimeout(hideToast,5000);
+}
+function hideToast(){
+  clearTimeout(window._toastHide);
+  document.getElementById('toastWrap').classList.remove('show');
+}
+setTimeout(()=>showToast(),9000);
+setInterval(()=>showToast(),15000);
+
+// ─── BOT LOGIC ───
+function getBotResponse(msg){
+  msg=msg.toLowerCase();
+  if(/catálogo|catalogo|cervezas|estilos|ver|qué tienen/.test(msg))
+    return{t:`Nuestro catálogo alquímico 🍺\n\n**🍺 GOLDEN** · 5.0% ABV · Suave y dorada\n**✦ IPA** · 6.2% ABV · Intensa y lupulada\n**◈ HIDROMIEL** · 7.5% ABV · Dulce y ancestral\n**○ 0 ALCOHOL** · 0.0% · Todo el sabor\n\n¿Cuál te interesa?`,bs:['Quiero la Golden','Quiero la IPA','Quiero el Hidromiel','Hacer un pedido']};
+  if(/golden/.test(msg))
+    return{t:`**GOLDEN ALE — La Clásica** 🍺\n\nABV 5.0% · IBU 18\n\nMalta pálida, lúpulo floral, levadura neutra. Color dorado brillante, espuma cremosa.\n\n¿La pedís en botellas o barril?`,bs:['Pedir botellas','Consultar barril','Ver otros estilos']};
+  if(/\bipa\b|india pale|lúpulo|intensa/.test(msg))
+    return{t:`**IPA — La Intensa** ✦\n\nABV 6.2% · IBU 45\n\nDry-hopped con Citra & Cascade. Notas cítricas, amargor elegante, final largo.`,bs:['Pedir botellas','Consultar barril','Ver otros estilos']};
+  if(/hidromiel|miel|ancestral/.test(msg))
+    return{t:`**HIDROMIEL — La Ancestral** ◈\n\nABV 7.5% · Sin lúpulo\n\nMiel de abejas locales fermentada lentamente. Dulce, floral, milenaria.`,bs:['Pedir botellas','Para un evento','Ver otros estilos']};
+  if(/sin alcohol|0 alcohol|cero|no tomo/.test(msg))
+    return{t:`**CERO ALCOHOL — La Libre** ○\n\nABV 0.0% · IBU 12\n\nDesalcoholización artesanal. Sabor completo, cuerpo genuino, sin compromiso.`,bs:['Pedir botellas','Ver otros estilos']};
+  if(/pedido|botellas|comprar|pedir|quiero|llevar/.test(msg))
+    return{t:`**¡Vamos con el pedido!** 📦\n\nBotellas 330ml con entrega en CABA y GBA.\n\n**1.** ¿Qué estilo/s?\n**2.** ¿Cuántas botellas?\n**3.** ¿Tu zona?\n\nO cerramos directo por WhatsApp 👇`,bs:['Golden','IPA','Hidromiel','Mix de estilos'],wa:true};
+  if(/barril|barriles|20l|50l/.test(msg))
+    return{t:`**BARRILES ALQUIMIA33** 🪣\n\n**20L** → ~60 vasos · Con canilla\n**50L** → Eventos grandes\n\n¿Para cuántas personas y qué fecha?`,bs:['Menos de 50 personas','Entre 50 y 150','Más de 150'],wa:true};
+  if(/truck|camión|evento|casamiento|cumpleaños|empresa|fiesta/.test(msg))
+    return{t:`**EL TRUCK ALQUIMIA33** 🚚\n\n✅ Casamientos, cumpleaños, corporativos, privados\n✅ CABA y GBA\n✅ Setup completo — choperas + 4 estilos\n\n¿Para cuántas personas y qué fecha?`,bs:['Menos de 50','Entre 50 y 150','Más de 150'],wa:true};
+  if(/precio|cuánto|costo|vale|presupuesto/.test(msg))
+    return{t:`**Precios personalizados** 💰\n\nVarían según estilo, cantidad y formato. Lo más rápido es por WhatsApp — presupuesto en minutos.`,wa:true};
+  if(/hola|buenas|hey|qué tal/.test(msg)){
+    const h=new Date().getHours();const sal=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+    return{t:`¡${sal}! Soy Osvaldo, alquimista de Alquimia33. 🍺\n\nEstoy acá para ayudarte a elegir tu cerveza, hacer un pedido o coordinar el truck.\n\n¿Qué necesitás?`,bs:['Ver cervezas','Hacer un pedido','Reservar el truck']};
+  }
+  if(/gracias|perfecto|genial|excelente/.test(msg))
+    return{t:`¡Un placer! 🙌\n\n**¡Que la alquimia esté siempre en tu vaso!** 🍺`,bs:['Hacer otro pedido','Reservar el truck']};
+  return{t:`Hablás con **OSVALDO**, alquimista de Alquimia33. 🍺\n\nTe ayudo con:\n• Golden, IPA, Hidromiel, 0 Alcohol\n• Botellas y delivery CABA & GBA\n• Barriles 20L y 50L\n• El Truck para tus eventos\n\n¿Qué necesitás?`,bs:['Ver cervezas','Hacer pedido','Reservar truck','Hablar por WhatsApp']};
+}
+
+function addBot(t,bs,wa){
+  const c=document.getElementById('chatMsgs');
+  const w=document.createElement('div');w.style='display:flex;gap:.55rem;align-items:flex-end;';
+  const av=document.createElement('div');av.style='width:24px;height:24px;min-width:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;';av.textContent='⚗';
+  const b=document.createElement('div');b.className='bbot';b.style='max-width:90%;';
+  const fmt=t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--gold)">$1</strong>').replace(/\n/g,'<br>');
+  b.innerHTML=`<p style="font-size:.8rem;line-height:1.72;color:var(--txt);">${fmt}</p>`;
+  if(bs?.length){const br=document.createElement('div');br.className='cqrow';bs.forEach(l=>{const btn=document.createElement('button');btn.className='cqb';btn.textContent=l;btn.onclick=()=>sendQ(l);br.appendChild(btn);});b.appendChild(br);}
+  if(wa){const a=document.createElement('a');a.href='https://wa.me/5491100000000?text=Hola!%20Vi%20el%20sitio%20de%20Alquimia33%20y%20quiero%20consultar.';a.target='_blank';a.style='display:inline-flex;align-items:center;gap:.4rem;margin-top:.65rem;padding:.5rem 1rem;background:#22C55E;color:#fff;border-radius:9999px;font-size:.75rem;font-weight:600;text-decoration:none;';a.innerHTML='💬 WhatsApp';b.appendChild(a);}
+  w.appendChild(av);w.appendChild(b);c.appendChild(w);c.scrollTop=c.scrollHeight;
+}
+function addUser(t){
+  const c=document.getElementById('chatMsgs');
+  const w=document.createElement('div');w.style='display:flex;justify-content:flex-end;';
+  const b=document.createElement('div');b.className='busr';b.innerHTML=`<p style="font-size:.8rem;line-height:1.55;color:var(--cream);">${t}</p>`;
+  w.appendChild(b);c.appendChild(w);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('chatMsgs');
+  const w=document.createElement('div');w.id='typi';w.style='display:flex;gap:.55rem;align-items:center;';
+  w.innerHTML=`<div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;">⚗</div><div class="bbot" style="padding:.65rem .9rem;"><div style="display:flex;gap:4px;"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>`;
+  c.appendChild(w);c.scrollTop=c.scrollHeight;return w;
+}
+function initBot(){
+  setTimeout(()=>addBot('¡Bienvenido a **ALQUIMIA33**! 🍺\n\nSoy Osvaldo, tu alquimista. Estoy acá para vender, atender y cerrar tu experiencia perfecta con cerveza artesanal.\n\n¿Qué necesitás?',['Ver cervezas','Hacer un pedido','Reservar el truck','¿Cuánto sale?']),300);
+}
+function sendMsg(){
+  const inp=document.getElementById('chatInput');const t=inp.value.trim();if(!t)return;
+  addUser(t);inp.value='';const ty=showTyping();
+  setTimeout(()=>{ty.remove();const r=getBotResponse(t);addBot(r.t,r.bs,r.wa);},700+Math.random()*500);
+}
+function sendQ(t){
+  openChat();
+  setTimeout(()=>{addUser(t);const ty=showTyping();setTimeout(()=>{ty.remove();const r=getBotResponse(t);addBot(r.t,r.bs,r.wa);},650+Math.random()*400);},100);
+}
+</script>
+</body>
+</html>
