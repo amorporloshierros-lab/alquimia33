@@ -7,62 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IBM+Plex+Mono:wght@300;400&family=Inter:wght@300;400;500;600&family=Pirata+One&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
-/* ══ INVOCAR RITUAL ══ */
-function invocarRitual(e){
-  if(e){e.preventDefault();e.stopPropagation();}
-  var ov=document.getElementById('invocarOverlay');
-  var sigil=document.getElementById('invocarSigil');
-  var txt=document.getElementById('invocarText');
-  var r1=document.getElementById('sr1'),r2=document.getElementById('sr2'),r3=document.getElementById('sr3'),r4=document.getElementById('sr4');
-  var cx=(e&&e.clientX)||window.innerWidth/2;
-  var cy=(e&&e.clientY)||window.innerHeight/2;
-  for(var i=0;i<20;i++){
-    (function(idx){
-      var sp=document.createElement('div');
-      sp.className='spark';
-      var ang=Math.random()*360;
-      var dist=50+Math.random()*90;
-      var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
-      var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
-      var dur=(0.4+Math.random()*0.5).toFixed(2);
-      sp.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+(Math.random()>0.5?'#E2B830':'#C9950E')+';animation:sparkFly '+dur+'s ease-out forwards;';
-      sp.style.setProperty('--tx',tx+'px');
-      sp.style.setProperty('--ty',ty+'px');
-      document.body.appendChild(sp);
-      setTimeout(function(){sp.remove();},1000);
-    })(i);
-  }
-  ov.classList.add('active');
-  var rings=[r1,r2,r3,r4];
-  var cols=['rgba(201,149,14,.72)','rgba(226,184,48,.6)','rgba(201,149,14,.5)','rgba(184,104,32,.65)'];
-  var anims=['spinCW 9s linear infinite','spinCCW 6s linear infinite','spinCW 13s linear infinite','spinCCW 4s linear infinite'];
-  rings.forEach(function(r,i){
-    setTimeout(function(){
-      r.classList.add('on');
-      r.style.borderColor=cols[i];
-      r.style.animation=anims[i];
-    },i*130);
-  });
-  setTimeout(function(){ sigil.classList.add('on'); },200);
-  var words=['INVOCANDO','INVOCANDO .','INVOCANDO . .','INVOCANDO . . .','CONVOCANDO','CONVOCANDO .','CONVOCANDO . .'];
-  var wi=0;
-  txt.classList.add('on');
-  txt.textContent=words[0];
-  var ti=setInterval(function(){ wi++;txt.textContent=words[wi%words.length]; },280);
-  setTimeout(function(){
-    clearInterval(ti);
-    txt.textContent='\u2736 ALQUIMISTA CONVOCADO \u2736';
-    setTimeout(function(){
-      ov.classList.remove('active');
-      sigil.classList.remove('on');
-      txt.classList.remove('on');
-      rings.forEach(function(r){ r.classList.remove('on'); r.style.animation='none'; r.style.borderColor='transparent'; });
-      setTimeout(function(){ openChat(); },300);
-    },800);
-  },2400);
-}
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
 :root{
@@ -220,20 +165,69 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 .tdot:nth-child(2){animation-delay:.18s;}
 .tdot:nth-child(3){animation-delay:.36s;}
 
-/* ═══ INVOCAR RITUAL ═══ — ZOOM + ESTRELLA + LEAD */
-#invocarOverlay{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background-color:transparent;pointer-events:none;transition:background-color .5s ease;}
-#invocarOverlay.active{background-color:rgba(9,7,15,.9);pointer-events:auto;}
-.s-ring{position:absolute;border-radius:50%;border-style:solid;border-color:transparent;opacity:0;transition:opacity .5s ease,border-color .5s ease;}
-.s-ring.on{opacity:1;}
-@keyframes spinCW{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes spinCCW{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes sigilPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(201,149,14,.5));}50%{filter:drop-shadow(0 0 22px rgba(226,184,48,1));}}
-#invocarSigil{position:absolute;opacity:0;transition:opacity .6s ease;}
-#invocarSigil.on{opacity:1;animation:sigilPulse 1.8s ease-in-out infinite;}
-#invocarText{position:absolute;top:calc(50% + 120px);font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.38em;color:var(--gold);text-transform:uppercase;opacity:0;transition:opacity .4s ease;text-align:center;white-space:nowrap;}
-#invocarText.on{opacity:1;}
-.spark{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:9600;}
+/* ═══ INVOCAR RITUAL ═══ */
+#invocarOverlay{position:fixed;inset:0;z-index:9400;background-color:transparent;pointer-events:none;transition:background-color .6s ease;}
+#invocarOverlay.active{background-color:rgba(9,7,15,.82);pointer-events:auto;}
+.spark{position:fixed;border-radius:50%;pointer-events:none;z-index:9600;}
 @keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1.2);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0);}}
+
+/* ═══ TRAVEL STAR ═══ */
+#travelStar{
+  position:fixed;width:14px;height:14px;border-radius:50%;
+  background:#fff;transform:translate(-50%,-50%);
+  box-shadow:0 0 6px 2px rgba(255,255,255,.9),0 0 20px 8px rgba(226,184,48,.9),0 0 40px 16px rgba(201,149,14,.5);
+  pointer-events:none;z-index:9601;opacity:0;
+}
+@keyframes starGlow{0%,100%{box-shadow:0 0 6px 2px rgba(255,255,255,.9),0 0 20px 8px rgba(226,184,48,.9),0 0 40px 16px rgba(201,149,14,.5);}50%{box-shadow:0 0 12px 5px rgba(255,255,255,1),0 0 35px 14px rgba(226,184,48,1),0 0 70px 28px rgba(201,149,14,.8);}}
+#travelStar.glow{animation:starGlow .35s ease-in-out infinite;}
+
+/* ═══ LEAD CAPTURE MODAL ═══ */
+#lcModal{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-52%) scale(0.88);
+  opacity:0;z-index:9700;width:min(420px,90vw);
+  pointer-events:none;
+  transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
+}
+#lcModal.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;}
+.lc-inner{
+  background:linear-gradient(145deg,rgba(9,7,15,.99),rgba(20,9,32,.99),rgba(30,11,48,.96));
+  border:1px solid rgba(201,149,14,.4);border-radius:1.75rem;
+  padding:2.2rem 2rem 2rem;
+  box-shadow:0 0 0 1px rgba(201,149,14,.06),0 0 80px rgba(201,149,14,.14),0 30px 80px rgba(0,0,0,.95);
+  position:relative;overflow:hidden;
+}
+.lc-inner::before{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:240px;height:240px;
+  background:radial-gradient(ellipse,rgba(201,149,14,.14) 0%,transparent 70%);
+  pointer-events:none;
+}
+.lc-field{
+  width:100%;background:rgba(30,9,50,.5);
+  border:1px solid rgba(201,149,14,.22);border-radius:.75rem;
+  padding:.8rem 1rem;color:var(--txt);
+  font-family:'Inter',sans-serif;font-size:.84rem;
+  outline:none;transition:border-color .3s,background .3s;
+  margin-bottom:.75rem;display:block;
+}
+.lc-field:focus{border-color:rgba(201,149,14,.7);background:rgba(40,14,65,.65);}
+.lc-field::placeholder{color:var(--muted);}
+select.lc-field{-webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9950E'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 1rem center;}
+.lc-btn{
+  width:100%;background:var(--gold);color:var(--void);
+  border:none;border-radius:.75rem;
+  padding:.95rem;font-family:'Cinzel',serif;font-size:.78rem;
+  font-weight:700;letter-spacing:.14em;cursor:pointer;
+  transition:background .25s,transform .18s,box-shadow .25s;
+  margin-top:.2rem;
+}
+.lc-btn:hover{background:var(--glit);transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,149,14,.35);}
+.lc-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.25rem .5rem;transition:color .2s;line-height:1;}
+.lc-close:hover{color:var(--cream);}
+#lcThanks{display:none;text-align:center;padding:.5rem 0 1rem;}
 </style>
 </head>
 <body>
@@ -245,7 +239,13 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 <header style="position:fixed;top:0;left:0;right:0;z-index:200;padding:1.3rem 2rem;">
   <div class="hpill" id="hpill" style="max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.4rem;">
     <div style="display:flex;align-items:center;gap:.75rem;">
-      <div style="display:flex;flex-direction:column;line-height:1;gap:.05rem;"><span style="font-family:'Pirata One',serif;font-size:1.45rem;color:var(--cream);letter-spacing:.03em;line-height:.95;text-shadow:0 0 18px rgba(201,149,14,.35);">Alquimia</span><div style="display:flex;align-items:baseline;gap:.4rem;"><span style="font-family:'Pirata One',serif;font-size:1.6rem;color:var(--gold);letter-spacing:.02em;line-height:1;text-shadow:0 0 14px rgba(201,149,14,.5);">33</span><span style="font-family:'Cormorant Garamond',serif;font-size:.52rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-style:italic;">cerveza premium</span></div></div>
+      <div style="display:flex;flex-direction:column;line-height:1;gap:.05rem;">
+        <span style="font-family:'Pirata One',serif;font-size:1.45rem;color:var(--cream);letter-spacing:.03em;line-height:.95;text-shadow:0 0 18px rgba(201,149,14,.35);">Alquimia</span>
+        <div style="display:flex;align-items:baseline;gap:.4rem;">
+          <span style="font-family:'Pirata One',serif;font-size:1.6rem;color:var(--gold);letter-spacing:.02em;line-height:1;text-shadow:0 0 14px rgba(201,149,14,.5);">33</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:.52rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-style:italic;">cerveza premium</span>
+        </div>
+      </div>
     </div>
     <nav style="display:flex;gap:2rem;align-items:center;">
       <a href="#cervezas" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Cervezas</a>
@@ -298,7 +298,18 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
     <div style="width:1px;height:42px;background:linear-gradient(to bottom,var(--gold),transparent);"></div>
   </div>
 
-  <button id="sndBtn" onclick="toggleHeroSound()" style="position:absolute;bottom:1.8rem;left:2rem;z-index:10;background:rgba(9,7,15,.55);backdrop-filter:blur(12px);border:1px solid rgba(201,149,14,.3);border-radius:9999px;padding:.42rem 1rem .42rem .7rem;display:flex;align-items:center;gap:.5rem;cursor:pointer;transition:border-color .3s,background .3s;" onmouseover="this.style.borderColor='rgba(201,149,14,.7)'" onmouseout="this.style.borderColor='rgba(201,149,14,.3)'"><span id="sndIcon" style="font-size:.95rem;line-height:1;">&#x1F507;</span><span id="sndLabel" class="mono" style="font-size:.55rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;">Activar sonido</span></button>
+  <!-- Botón de sonido -->
+  <button id="sndBtn" onclick="toggleHeroSound()" style="
+    position:absolute;bottom:1.8rem;left:2rem;z-index:10;
+    background:rgba(9,7,15,.55);backdrop-filter:blur(12px);
+    border:1px solid rgba(201,149,14,.3);border-radius:9999px;
+    padding:.42rem 1rem .42rem .7rem;
+    display:flex;align-items:center;gap:.5rem;cursor:pointer;
+    transition:border-color .3s,background .3s;
+  " onmouseover="this.style.borderColor='rgba(201,149,14,.7)'" onmouseout="this.style.borderColor='rgba(201,149,14,.3)'">
+    <span id="sndIcon" style="font-size:.95rem;line-height:1;">🔇</span>
+    <span id="sndLabel" class="mono" style="font-size:.55rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;">Activar sonido</span>
+  </button>
 </section>
 
 <!-- ══════════════ FEATURES ══════════════ -->
@@ -666,7 +677,13 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;">
       <div>
         <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;">
-          <div style="display:flex;flex-direction:column;line-height:1;gap:.04rem;"><span style="font-family:'Pirata One',serif;font-size:1.35rem;color:var(--cream);letter-spacing:.03em;line-height:.95;text-shadow:0 0 14px rgba(201,149,14,.3);">Alquimia</span><div style="display:flex;align-items:baseline;gap:.35rem;"><span style="font-family:'Pirata One',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.02em;line-height:1;text-shadow:0 0 12px rgba(201,149,14,.45);">33</span><span style="font-family:'Cormorant Garamond',serif;font-size:.5rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;font-style:italic;">cerveza premium</span></div></div>
+          <div style="display:flex;flex-direction:column;line-height:1;gap:.04rem;">
+            <span style="font-family:'Pirata One',serif;font-size:1.35rem;color:var(--cream);letter-spacing:.03em;line-height:.95;text-shadow:0 0 14px rgba(201,149,14,.3);">Alquimia</span>
+            <div style="display:flex;align-items:baseline;gap:.35rem;">
+              <span style="font-family:'Pirata One',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.02em;line-height:1;text-shadow:0 0 12px rgba(201,149,14,.45);">33</span>
+              <span style="font-family:'Cormorant Garamond',serif;font-size:.5rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;font-style:italic;">cerveza premium</span>
+            </div>
+          </div>
         </div>
         <p style="color:var(--muted);font-size:.8rem;line-height:1.85;max-width:220px;">Cerveza artesanal premium desde San Telmo, Buenos Aires. Donde la alquimia se convierte en cerveza.</p>
         <div style="display:flex;align-items:center;gap:.5rem;margin-top:1.5rem;">
@@ -685,26 +702,36 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
   </div>
 </footer>
 
-<!-- ══════════════ INVOCAR OVERLAY ══════════════ -->
+<!-- ══════════════ INVOCAR OVERLAY (dark bg solo) ══════════════ -->
 <div id="invocarOverlay"></div>
+
+<!-- ══════════════ TRAVEL STAR ══════════════ -->
 <div id="travelStar"></div>
+
+<!-- ══════════════ LEAD CAPTURE MODAL ══════════════ -->
 <div id="lcModal">
   <div class="lc-inner">
-    <button class="lc-close" onclick="closeLcModal()">&#x2715;</button>
+    <button class="lc-close" onclick="closeLcModal()">✕</button>
     <div id="lcFormContent">
       <div style="text-align:center;margin-bottom:1.5rem;">
-        <div class="stag" style="margin-bottom:.65rem;font-size:.58rem;">&#x2726; CONVOCACI&#xF3;N</div>
+        <div class="stag" style="margin-bottom:.65rem;font-size:.58rem;">✦ CONVOCACIÓN</div>
         <h3 class="cinzel" style="font-size:1.15rem;color:var(--gold);letter-spacing:.06em;">El Alquimista te espera</h3>
-        <p style="font-size:.75rem;color:var(--muted);margin-top:.5rem;line-height:1.6;">Dej&#xe1; tus datos y te respondemos en minutos.</p>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:.5rem;line-height:1.6;">Dejá tus datos y te respondemos en minutos.</p>
       </div>
       <input class="lc-field" id="lcName" type="text" placeholder="Tu nombre"/>
       <input class="lc-field" id="lcWa" type="tel" placeholder="WhatsApp (ej: 11 1234-5678)"/>
-      <select class="lc-field" id="lcNeed"><option value="" disabled selected>&#xBF;Qu&#xe9; busc&#xe1;s?</option><option value="Pedir cervezas (botellas)">Pedir cervezas (botellas)</option><option value="Barril para un evento">Barril para un evento</option><option value="Reservar el truck">Reservar el truck</option><option value="Consulta general">Consulta general</option></select>
-      <button class="lc-btn" onclick="submitLcForm()">INVOCAR &#x2726;</button>
+      <select class="lc-field" id="lcNeed">
+        <option value="" disabled selected>¿Qué buscás?</option>
+        <option value="Pedir cervezas (botellas)">Pedir cervezas (botellas)</option>
+        <option value="Barril para un evento">Barril para un evento</option>
+        <option value="Reservar el truck">Reservar el truck</option>
+        <option value="Consulta general">Consulta general</option>
+      </select>
+      <button class="lc-btn" onclick="submitLcForm()">INVOCAR ✦</button>
     </div>
-    <div id="lcThanks" style="display:none;text-align:center;padding:.5rem 0 1rem;">
-      <div style="font-size:2.5rem;margin-bottom:1rem;color:var(--gold);">&#x2736;</div>
-      <h3 class="cinzel" style="color:var(--gold);font-size:1.1rem;margin-bottom:.75rem;">&#xA1;La alquimia est&#xe1; en movimiento!</h3>
+    <div id="lcThanks">
+      <div style="font-size:2.5rem;margin-bottom:1rem;color:var(--gold);">✶</div>
+      <h3 class="cinzel" style="color:var(--gold);font-size:1.1rem;margin-bottom:.75rem;letter-spacing:.05em;">¡La alquimia está en movimiento!</h3>
       <p style="color:var(--muted);font-size:.82rem;line-height:1.75;">Te contactamos a la brevedad.<br>Mientras tanto, el alquimista te atiende.</p>
     </div>
   </div>
@@ -1017,6 +1044,133 @@ function sendQ(t){
   openChat();
   setTimeout(()=>{addUser(t);const ty=showTyping();setTimeout(()=>{ty.remove();const r=getBotResponse(t);addBot(r.t,r.bs,r.wa);},650+Math.random()*400);},100);
 }
+
+/* ══ INVOCAR RITUAL — ZOOM AL CIELO + ESTRELLA + LEAD ══ */
+function invocarRitual(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  var cx=(e&&e.clientX)||window.innerWidth/2;
+  var cy=(e&&e.clientY)||window.innerHeight/2;
+  // 1 — Sparks
+  for(var i=0;i<24;i++){
+    (function(){
+      var sp=document.createElement('div');
+      sp.className='spark';
+      var ang=Math.random()*360,dist=55+Math.random()*110;
+      var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
+      var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
+      var dur=(0.3+Math.random()*0.55).toFixed(2);
+      var sz=(3+Math.random()*5).toFixed(1);
+      sp.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+sz+'px;height:'+sz+'px;background:'+(Math.random()>0.4?'#E2B830':'#fff')+';animation:sparkFly '+dur+'s ease-out forwards;';
+      sp.style.setProperty('--tx',tx+'px');sp.style.setProperty('--ty',ty+'px');
+      document.body.appendChild(sp);
+      setTimeout(function(){sp.remove();},1000);
+    })();
+  }
+  // 2 — Overlay oscuro
+  document.getElementById('invocarOverlay').classList.add('active');
+  // 3 — Zoom dramático del hero hacia el cielo
+  var vid=document.getElementById('heroVideo');
+  if(vid&&window.gsap){
+    gsap.killTweensOf(vid);
+    gsap.to(vid,{scale:3.2,y:'-8%',duration:3,ease:'power2.in',filter:'brightness(1.6) blur(0px)'});
+  }
+  // 4 — Estrella nace y viaja al cielo
+  var star=document.getElementById('travelStar');
+  star.style.left=cx+'px';star.style.top=cy+'px';star.style.opacity='1';
+  star.classList.add('glow');
+  var destX=window.innerWidth/2,destY=window.innerHeight*0.08;
+  function onStarArrived(){
+    star.classList.remove('glow');star.style.opacity='0';
+    // 5 — Explosión en el cielo
+    for(var j=0;j<38;j++){
+      (function(){
+        var bp=document.createElement('div');
+        bp.className='spark';
+        var ang=Math.random()*360,dist=12+Math.random()*170;
+        var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
+        var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
+        var dur=(0.5+Math.random()*1.1).toFixed(2);
+        var sz=(2+Math.random()*8).toFixed(1);
+        var col=Math.random()>0.5?'#fff':(Math.random()>0.5?'#E2B830':'#C9950E');
+        bp.style.cssText='left:'+destX+'px;top:'+destY+'px;width:'+sz+'px;height:'+sz+'px;background:'+col+';animation:sparkFly '+dur+'s ease-out forwards;';
+        bp.style.setProperty('--tx',tx+'px');bp.style.setProperty('--ty',ty+'px');
+        document.body.appendChild(bp);setTimeout(function(){bp.remove();},1600);
+      })();
+    }
+    // 6 — Lead form
+    setTimeout(function(){ document.getElementById('lcModal').classList.add('open'); },380);
+  }
+  if(window.gsap){
+    gsap.to(star,{left:destX,top:destY,duration:1.05,delay:0.12,ease:'power3.in',onComplete:onStarArrived});
+  } else { setTimeout(onStarArrived,1200); }
+}
+
+function closeLcModal(){
+  document.getElementById('lcModal').classList.remove('open');
+  document.getElementById('invocarOverlay').classList.remove('active');
+  var vid=document.getElementById('heroVideo');
+  if(vid&&window.gsap) gsap.to(vid,{scale:1,y:'0%',duration:1.8,ease:'power2.out',filter:'brightness(1) blur(0px)'});
+  setTimeout(function(){
+    document.getElementById('lcFormContent').style.display='block';
+    document.getElementById('lcThanks').style.display='none';
+    document.getElementById('lcName').value='';
+    document.getElementById('lcWa').value='';
+    document.getElementById('lcNeed').value='';
+  },600);
+}
+
+function submitLcForm(){
+  var name=document.getElementById('lcName').value.trim();
+  var wa=document.getElementById('lcWa').value.trim();
+  var need=document.getElementById('lcNeed').value;
+  if(!name||!wa){
+    ['lcName','lcWa'].forEach(function(id){
+      var f=document.getElementById(id);
+      if(!f.value.trim()){f.style.borderColor='rgba(220,60,60,.65)';setTimeout(function(){f.style.borderColor='';},1500);}
+    });
+    return;
+  }
+  document.getElementById('lcFormContent').style.display='none';
+  document.getElementById('lcThanks').style.display='block';
+  setTimeout(function(){
+    closeLcModal();
+    setTimeout(function(){
+      openChat();
+      setTimeout(function(){
+        addBot('Hola **'+name+'**! ✦\n\nRecibí tus datos.'+(need?' Vi que buscás **'+need+'**.':'')+'\n\n¿Cómo te puedo ayudar?',['Hacer un pedido','Reservar el truck','Consultar precios']);
+      },450);
+    },700);
+  },2600);
+}
+
+// ══ SONIDO AMBIENTE ══
+var _sndOn=false;
+function setSoundState(on){
+  var vid=document.getElementById('heroVideo');
+  if(!vid)return;
+  _sndOn=on;
+  vid.muted=!on;
+  if(on)vid.volume=0.15;
+  var icon=document.getElementById('sndIcon');
+  var lbl=document.getElementById('sndLabel');
+  if(icon)icon.textContent=on?'🔊':'🔇';
+  if(lbl)lbl.textContent=on?'Sonido activo':'Activar sonido';
+  if(lbl)lbl.style.color=on?'var(--gold)':'var(--muted)';
+}
+function toggleHeroSound(){
+  setSoundState(!_sndOn);
+}
+// Intento automático cuando el video empieza (funciona en algunos browsers)
+(function(){
+  var vid=document.getElementById('heroVideo');
+  if(!vid)return;
+  vid.addEventListener('play',function(){
+    setTimeout(function(){
+      vid.muted=false;vid.volume=0.15;
+      if(!vid.muted){setSoundState(true);}
+    },300);
+  },{once:true});
+})();
 </script>
 </body>
 </html>
