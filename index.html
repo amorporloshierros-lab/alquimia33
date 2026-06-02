@@ -830,31 +830,31 @@ select.lc-field{-webkit-appearance:none;appearance:none;cursor:pointer;
 window.addEventListener('scroll',()=>document.getElementById('hpill').classList.toggle('sc',scrollY>60));
 
 // ─── HERO VIDEO ZOOM-IN ───
-// El curtain se abre con DOMContentLoaded (no espera el video)
-// El zoom del video se activa cuando el video tiene datos
-document.addEventListener('DOMContentLoaded',()=>{
-  const vid=document.getElementById('heroVideo');
-  const curtain=document.getElementById('heroCurtain');
-  gsap.set(curtain,{opacity:1});
+// Script está al final del body — DOM ya disponible, ejecutar directo
+(function(){
+  var vid=document.getElementById('heroVideo');
+  var curtain=document.getElementById('heroCurtain');
+  if(!vid||!curtain)return;
 
-  // Fade out curtain sin importar el estado del video
-  gsap.to(curtain,{opacity:0,duration:1,delay:.4,ease:'power2.out',
-    onComplete:()=>{ curtain.style.display='none'; showHeroText(); }
+  // Curtain abre inmediatamente sin esperar el video
+  gsap.set(curtain,{opacity:1});
+  gsap.to(curtain,{opacity:0,duration:1,delay:.3,ease:'power2.out',
+    onComplete:function(){ curtain.style.display='none'; showHeroText(); }
   });
 
-  // Zoom del video cuando tenga datos suficientes
+  // Video zoom cuando tenga datos (o fallback a los 2.5s)
   gsap.set(vid,{scale:1.12,filter:'blur(6px)'});
+  var zoomed=false;
   function startVideoZoom(){
+    if(zoomed)return; zoomed=true;
     gsap.to(vid,{scale:1,filter:'blur(0px)',duration:2.8,ease:'power2.out'});
   }
-  if(vid.readyState>=2){
-    startVideoZoom();
-  } else {
-    vid.addEventListener('canplay', startVideoZoom, {once:true});
-    // Fallback si el video tarda más de 3s
-    setTimeout(startVideoZoom, 3000);
+  if(vid.readyState>=2){ startVideoZoom(); }
+  else {
+    vid.addEventListener('canplay',startVideoZoom,{once:true});
+    setTimeout(startVideoZoom,2500);
   }
-});
+})();
 
 function showHeroText(){
   gsap.set(['#ht0','#ht1','#ht2','#ht3','#ht4','#ht5','#ht6'],{y:55});
@@ -1169,4 +1169,6 @@ function setSoundState(on){
   var lbl=document.getElementById('sndLabel');
   if(icon)icon.textContent=on?'🔊':'🔇';
   if(lbl)lbl.textContent=on?'Sonido activo':'Activar sonido';
-  if(lbl)lbl.style.color=on?'
+  if(lbl)lbl.style.color=on?'var(--gold)':'var(--muted)';
+}
+function toggl
