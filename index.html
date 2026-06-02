@@ -220,7 +220,7 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 .tdot:nth-child(2){animation-delay:.18s;}
 .tdot:nth-child(3){animation-delay:.36s;}
 
-/* ═══ INVOCAR RITUAL ═══ */
+/* ═══ INVOCAR RITUAL ═══ — ZOOM + ESTRELLA + LEAD */
 #invocarOverlay{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background-color:transparent;pointer-events:none;transition:background-color .5s ease;}
 #invocarOverlay.active{background-color:rgba(9,7,15,.9);pointer-events:auto;}
 .s-ring{position:absolute;border-radius:50%;border-style:solid;border-color:transparent;opacity:0;transition:opacity .5s ease,border-color .5s ease;}
@@ -664,8 +664,7 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;">
       <div>
         <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;">
-          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;"><span class="cinzel" style="font-size:.72rem;font-weight:700;color:var(--void);">A33</span></div>
-          <span class="cinzel" style="font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:.08em;">ALQUIMIA33</span>
+          <div style="display:flex;flex-direction:column;line-height:1;gap:.04rem;"><span style="font-family:'Pirata One',serif;font-size:1.35rem;color:var(--cream);letter-spacing:.03em;line-height:.95;text-shadow:0 0 14px rgba(201,149,14,.3);">Alquimia</span><div style="display:flex;align-items:baseline;gap:.35rem;"><span style="font-family:'Pirata One',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.02em;line-height:1;text-shadow:0 0 12px rgba(201,149,14,.45);">33</span><span style="font-family:'Cormorant Garamond',serif;font-size:.5rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;font-style:italic;">cerveza premium</span></div></div>
         </div>
         <p style="color:var(--muted);font-size:.8rem;line-height:1.85;max-width:220px;">Cerveza artesanal premium desde San Telmo, Buenos Aires. Donde la alquimia se convierte en cerveza.</p>
         <div style="display:flex;align-items:center;gap:.5rem;margin-top:1.5rem;">
@@ -684,23 +683,29 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
   </div>
 </footer>
 
-<!-- ══════════════ INVOCAR RITUAL OVERLAY ══════════════ -->
-<div id="invocarOverlay">
-  <div class="s-ring" id="sr1" style="width:320px;height:320px;border-width:1px;border-style:dashed;"></div>
-  <div class="s-ring" id="sr2" style="width:260px;height:260px;border-width:1.5px;"></div>
-  <div class="s-ring" id="sr3" style="width:200px;height:200px;border-width:1px;border-style:dashed;"></div>
-  <div class="s-ring" id="sr4" style="width:140px;height:140px;border-width:2px;"></div>
-  <svg id="invocarSigil" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="45" cy="45" r="40" stroke="rgba(201,149,14,.55)" stroke-width="1"/>
-    <polygon points="45,5 51,39 85,45 51,51 45,85 39,51 5,45 39,39" fill="rgba(201,149,14,.12)" stroke="rgba(201,149,14,.75)" stroke-width="1.2"/>
-    <circle cx="45" cy="45" r="12" fill="rgba(201,149,14,.18)" stroke="rgba(201,149,14,.7)" stroke-width="1"/>
-    <circle cx="45" cy="45" r="4" fill="rgba(226,184,48,.95)"/>
-    <line x1="45" y1="5" x2="45" y2="33" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
-    <line x1="45" y1="57" x2="45" y2="85" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
-    <line x1="5" y1="45" x2="33" y2="45" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
-    <line x1="57" y1="45" x2="85" y2="45" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
-  </svg>
-  <span id="invocarText"></span>
+<!-- ══════════════ INVOCAR OVERLAY ══════════════ -->
+<div id="invocarOverlay"></div>
+<div id="travelStar"></div>
+<div id="lcModal">
+  <div class="lc-inner">
+    <button class="lc-close" onclick="closeLcModal()">&#x2715;</button>
+    <div id="lcFormContent">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div class="stag" style="margin-bottom:.65rem;font-size:.58rem;">&#x2726; CONVOCACI&#xF3;N</div>
+        <h3 class="cinzel" style="font-size:1.15rem;color:var(--gold);letter-spacing:.06em;">El Alquimista te espera</h3>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:.5rem;line-height:1.6;">Dej&#xe1; tus datos y te respondemos en minutos.</p>
+      </div>
+      <input class="lc-field" id="lcName" type="text" placeholder="Tu nombre"/>
+      <input class="lc-field" id="lcWa" type="tel" placeholder="WhatsApp (ej: 11 1234-5678)"/>
+      <select class="lc-field" id="lcNeed"><option value="" disabled selected>&#xBF;Qu&#xe9; busc&#xe1;s?</option><option value="Pedir cervezas (botellas)">Pedir cervezas (botellas)</option><option value="Barril para un evento">Barril para un evento</option><option value="Reservar el truck">Reservar el truck</option><option value="Consulta general">Consulta general</option></select>
+      <button class="lc-btn" onclick="submitLcForm()">INVOCAR &#x2726;</button>
+    </div>
+    <div id="lcThanks" style="display:none;text-align:center;padding:.5rem 0 1rem;">
+      <div style="font-size:2.5rem;margin-bottom:1rem;color:var(--gold);">&#x2736;</div>
+      <h3 class="cinzel" style="color:var(--gold);font-size:1.1rem;margin-bottom:.75rem;">&#xA1;La alquimia est&#xe1; en movimiento!</h3>
+      <p style="color:var(--muted);font-size:.82rem;line-height:1.75;">Te contactamos a la brevedad.<br>Mientras tanto, el alquimista te atiende.</p>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════ TOAST ══════════════ -->
