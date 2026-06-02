@@ -7,7 +7,56 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IBM+Plex+Mono:wght@300;400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
+/* ══ INVOCAR RITUAL ══ */
+function invocarRitual(e){
+  e&&e.preventDefault();
+  const ov=document.getElementById('invocarOverlay');
+  const sigil=document.getElementById('invocarSigil');
+  const txt=document.getElementById('invocarText');
+  const rings=[document.getElementById('sr1'),document.getElementById('sr2'),document.getElementById('sr3'),document.getElementById('sr4')];
+  if(e){
+    const cx=e.clientX||window.innerWidth/2, cy=e.clientY||window.innerHeight/2;
+    for(let i=0;i<18;i++){
+      const sp=document.createElement('div');
+      sp.className='spark';
+      const ang=Math.random()*360, dist=40+Math.random()*80;
+      sp.style.left=cx+'px'; sp.style.top=cy+'px';
+      sp.style.setProperty('--dx',Math.cos(ang*Math.PI/180)*dist+'px');
+      sp.style.setProperty('--dy',Math.sin(ang*Math.PI/180)*dist+'px');
+      sp.style.animation='sparkFly '+(0.4+Math.random()*0.5)+'s ease-out forwards';
+      sp.style.background=Math.random()>.5?'#E2B830':'#C9950E';
+      document.body.appendChild(sp);
+      setTimeout(()=>sp.remove(),900);
+    }
+  }
+  ov.classList.add('active');
+  const dirs=['spinCW 8s linear infinite','spinCCW 5s linear infinite','spinCW 12s linear infinite','spinCCW 3s linear infinite'];
+  rings.forEach((r,i)=>{
+    setTimeout(()=>{
+      r.style.opacity='1';
+      r.style.borderColor='rgba(201,149,14,'+(0.7-i*0.12)+')';
+      r.style.animation=dirs[i];
+    },i*120);
+  });
+  setTimeout(()=>{ sigil.style.opacity='1'; },300);
+  txt.style.opacity='1';
+  const frames=['INVOCANDO','INVOCANDO·','INVOCANDO··','INVOCANDO···','·INVOCANDO··','··INVOCANDO·','···INVOCANDO'];
+  let fi=0;
+  const ti=setInterval(()=>{ txt.textContent=frames[fi++%frames.length]; },220);
+  setTimeout(()=>{
+    clearInterval(ti);
+    txt.textContent='✶ ALQUIMISTA CONVOCADO ✶';
+    setTimeout(()=>{
+      ov.classList.remove('active');
+      sigil.style.opacity='0';
+      txt.style.opacity='0';
+      rings.forEach(r=>{ r.style.opacity='0'; r.style.animation='none'; r.style.borderColor='rgba(201,149,14,0)'; });
+      openChat();
+    },700);
+  },2200);
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
 :root{
@@ -164,6 +213,18 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 .tdot{display:inline-block;width:5px;height:5px;background:var(--gold);border-radius:50%;animation:tdot .9s infinite;}
 .tdot:nth-child(2){animation-delay:.18s;}
 .tdot:nth-child(3){animation-delay:.36s;}
+
+/* ═══ INVOCAR RITUAL ═══ */
+#invocarOverlay{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(9,7,15,0);pointer-events:none;transition:background .5s;}
+#invocarOverlay.active{background:rgba(9,7,15,.88);pointer-events:auto;}
+.s-ring{position:absolute;border-radius:50%;border-style:solid;border-color:rgba(201,149,14,0);opacity:0;transition:opacity .4s,border-color .4s;}
+@keyframes spinCW{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spinCCW{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes sigilPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(201,149,14,.4));}50%{filter:drop-shadow(0 0 18px rgba(201,149,14,.9));}}
+#invocarSigil{position:absolute;opacity:0;transition:opacity .5s;animation:sigilPulse 1.8s ease-in-out infinite;}
+#invocarText{position:absolute;bottom:calc(50% - 200px);font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;opacity:0;transition:opacity .4s;text-align:center;}
+.spark{position:fixed;width:4px;height:4px;border-radius:50%;background:var(--glit);pointer-events:none;z-index:9600;}
+@keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0);}}
 </style>
 </head>
 <body>
@@ -184,7 +245,7 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
       <a href="#cervezas" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Cervezas</a>
       <a href="#proceso" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Proceso</a>
       <a href="#truck" style="font-size:.8rem;letter-spacing:.05em;color:var(--muted);text-decoration:none;transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">El Truck</a>
-      <a href="#" onclick="openChat();return false;" class="mag cinzel" style="font-size:.7rem;font-weight:700;border:1px solid var(--gold);color:var(--gold);padding:.5rem 1.25rem;border-radius:9999px;text-decoration:none;display:inline-block;letter-spacing:.1em;">
+      <a href="#" onclick="invocarRitual(event);return false;" class="mag cinzel" style="font-size:.7rem;font-weight:700;border:1px solid var(--gold);color:var(--gold);padding:.5rem 1.25rem;border-radius:9999px;text-decoration:none;display:inline-block;letter-spacing:.1em;">
         <div class="mf" style="background:var(--gold);"></div>
         <span style="position:relative;z-index:1;transition:color .4s;">INVOCAR ✦</span>
       </a>
@@ -215,7 +276,7 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
       Cerveza artesanal premium elaborada con pasión,<br>ingredientes seleccionados y un toque de <em style="color:var(--gold);">magia alquímica.</em>
     </p>
     <div id="ht6" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;">
-      <a href="#" onclick="openChat();return false;" class="mag cinzel" style="display:inline-block;font-size:.8rem;font-weight:700;background:var(--gold);color:var(--void);padding:1rem 2.5rem;border-radius:9999px;text-decoration:none;letter-spacing:.1em;">
+      <a href="#" onclick="invocarRitual(event);return false;" class="mag cinzel" style="display:inline-block;font-size:.8rem;font-weight:700;background:var(--gold);color:var(--void);padding:1rem 2.5rem;border-radius:9999px;text-decoration:none;letter-spacing:.1em;">
         <div class="mf" style="background:var(--glit);"></div>
         <span>✦ INVOCAR TU EXPERIENCIA</span>
       </a>
@@ -616,6 +677,25 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
     </div>
   </div>
 </footer>
+
+<!-- ══════════════ INVOCAR RITUAL OVERLAY ══════════════ -->
+<div id="invocarOverlay">
+  <div class="s-ring" id="sr1" style="width:320px;height:320px;border-width:1px;border-style:dashed;"></div>
+  <div class="s-ring" id="sr2" style="width:260px;height:260px;border-width:1.5px;"></div>
+  <div class="s-ring" id="sr3" style="width:200px;height:200px;border-width:1px;border-style:dashed;"></div>
+  <div class="s-ring" id="sr4" style="width:140px;height:140px;border-width:2px;"></div>
+  <svg id="invocarSigil" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="45" cy="45" r="40" stroke="rgba(201,149,14,.55)" stroke-width="1"/>
+    <polygon points="45,5 51,39 85,45 51,51 45,85 39,51 5,45 39,39" fill="rgba(201,149,14,.12)" stroke="rgba(201,149,14,.75)" stroke-width="1.2"/>
+    <circle cx="45" cy="45" r="12" fill="rgba(201,149,14,.18)" stroke="rgba(201,149,14,.7)" stroke-width="1"/>
+    <circle cx="45" cy="45" r="4" fill="rgba(226,184,48,.95)"/>
+    <line x1="45" y1="5" x2="45" y2="33" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
+    <line x1="45" y1="57" x2="45" y2="85" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
+    <line x1="5" y1="45" x2="33" y2="45" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
+    <line x1="57" y1="45" x2="85" y2="45" stroke="rgba(201,149,14,.35)" stroke-width=".8"/>
+  </svg>
+  <span id="invocarText"></span>
+</div>
 
 <!-- ══════════════ TOAST ══════════════ -->
 <div id="toastWrap">
