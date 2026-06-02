@@ -10,51 +10,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
 /* ══ INVOCAR RITUAL ══ */
 function invocarRitual(e){
-  e&&e.preventDefault();
-  const ov=document.getElementById('invocarOverlay');
-  const sigil=document.getElementById('invocarSigil');
-  const txt=document.getElementById('invocarText');
-  const rings=[document.getElementById('sr1'),document.getElementById('sr2'),document.getElementById('sr3'),document.getElementById('sr4')];
-  if(e){
-    const cx=e.clientX||window.innerWidth/2, cy=e.clientY||window.innerHeight/2;
-    for(let i=0;i<18;i++){
-      const sp=document.createElement('div');
+  if(e){e.preventDefault();e.stopPropagation();}
+  var ov=document.getElementById('invocarOverlay');
+  var sigil=document.getElementById('invocarSigil');
+  var txt=document.getElementById('invocarText');
+  var r1=document.getElementById('sr1'),r2=document.getElementById('sr2'),r3=document.getElementById('sr3'),r4=document.getElementById('sr4');
+  var cx=(e&&e.clientX)||window.innerWidth/2;
+  var cy=(e&&e.clientY)||window.innerHeight/2;
+  for(var i=0;i<20;i++){
+    (function(idx){
+      var sp=document.createElement('div');
       sp.className='spark';
-      const ang=Math.random()*360, dist=40+Math.random()*80;
-      sp.style.left=cx+'px'; sp.style.top=cy+'px';
-      sp.style.setProperty('--dx',Math.cos(ang*Math.PI/180)*dist+'px');
-      sp.style.setProperty('--dy',Math.sin(ang*Math.PI/180)*dist+'px');
-      sp.style.animation='sparkFly '+(0.4+Math.random()*0.5)+'s ease-out forwards';
-      sp.style.background=Math.random()>.5?'#E2B830':'#C9950E';
+      var ang=Math.random()*360;
+      var dist=50+Math.random()*90;
+      var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
+      var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
+      var dur=(0.4+Math.random()*0.5).toFixed(2);
+      sp.style.cssText='left:'+cx+'px;top:'+cy+'px;background:'+(Math.random()>0.5?'#E2B830':'#C9950E')+';animation:sparkFly '+dur+'s ease-out forwards;';
+      sp.style.setProperty('--tx',tx+'px');
+      sp.style.setProperty('--ty',ty+'px');
       document.body.appendChild(sp);
-      setTimeout(()=>sp.remove(),900);
-    }
+      setTimeout(function(){sp.remove();},1000);
+    })(i);
   }
   ov.classList.add('active');
-  const dirs=['spinCW 8s linear infinite','spinCCW 5s linear infinite','spinCW 12s linear infinite','spinCCW 3s linear infinite'];
-  rings.forEach((r,i)=>{
-    setTimeout(()=>{
-      r.style.opacity='1';
-      r.style.borderColor='rgba(201,149,14,'+(0.7-i*0.12)+')';
-      r.style.animation=dirs[i];
-    },i*120);
+  var rings=[r1,r2,r3,r4];
+  var cols=['rgba(201,149,14,.72)','rgba(226,184,48,.6)','rgba(201,149,14,.5)','rgba(184,104,32,.65)'];
+  var anims=['spinCW 9s linear infinite','spinCCW 6s linear infinite','spinCW 13s linear infinite','spinCCW 4s linear infinite'];
+  rings.forEach(function(r,i){
+    setTimeout(function(){
+      r.classList.add('on');
+      r.style.borderColor=cols[i];
+      r.style.animation=anims[i];
+    },i*130);
   });
-  setTimeout(()=>{ sigil.style.opacity='1'; },300);
-  txt.style.opacity='1';
-  const frames=['INVOCANDO','INVOCANDO·','INVOCANDO··','INVOCANDO···','·INVOCANDO··','··INVOCANDO·','···INVOCANDO'];
-  let fi=0;
-  const ti=setInterval(()=>{ txt.textContent=frames[fi++%frames.length]; },220);
-  setTimeout(()=>{
+  setTimeout(function(){ sigil.classList.add('on'); },200);
+  var words=['INVOCANDO','INVOCANDO .','INVOCANDO . .','INVOCANDO . . .','CONVOCANDO','CONVOCANDO .','CONVOCANDO . .'];
+  var wi=0;
+  txt.classList.add('on');
+  txt.textContent=words[0];
+  var ti=setInterval(function(){ wi++;txt.textContent=words[wi%words.length]; },280);
+  setTimeout(function(){
     clearInterval(ti);
-    txt.textContent='✶ ALQUIMISTA CONVOCADO ✶';
-    setTimeout(()=>{
+    txt.textContent='\u2736 ALQUIMISTA CONVOCADO \u2736';
+    setTimeout(function(){
       ov.classList.remove('active');
-      sigil.style.opacity='0';
-      txt.style.opacity='0';
-      rings.forEach(r=>{ r.style.opacity='0'; r.style.animation='none'; r.style.borderColor='rgba(201,149,14,0)'; });
-      openChat();
-    },700);
-  },2200);
+      sigil.classList.remove('on');
+      txt.classList.remove('on');
+      rings.forEach(function(r){ r.classList.remove('on'); r.style.animation='none'; r.style.borderColor='transparent'; });
+      setTimeout(function(){ openChat(); },300);
+    },800);
+  },2400);
 }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -215,16 +221,19 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 .tdot:nth-child(3){animation-delay:.36s;}
 
 /* ═══ INVOCAR RITUAL ═══ */
-#invocarOverlay{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(9,7,15,0);pointer-events:none;transition:background .5s;}
-#invocarOverlay.active{background:rgba(9,7,15,.88);pointer-events:auto;}
-.s-ring{position:absolute;border-radius:50%;border-style:solid;border-color:rgba(201,149,14,0);opacity:0;transition:opacity .4s,border-color .4s;}
+#invocarOverlay{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background-color:transparent;pointer-events:none;transition:background-color .5s ease;}
+#invocarOverlay.active{background-color:rgba(9,7,15,.9);pointer-events:auto;}
+.s-ring{position:absolute;border-radius:50%;border-style:solid;border-color:transparent;opacity:0;transition:opacity .5s ease,border-color .5s ease;}
+.s-ring.on{opacity:1;}
 @keyframes spinCW{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes spinCCW{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes sigilPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(201,149,14,.4));}50%{filter:drop-shadow(0 0 18px rgba(201,149,14,.9));}}
-#invocarSigil{position:absolute;opacity:0;transition:opacity .5s;animation:sigilPulse 1.8s ease-in-out infinite;}
-#invocarText{position:absolute;bottom:calc(50% - 200px);font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;opacity:0;transition:opacity .4s;text-align:center;}
-.spark{position:fixed;width:4px;height:4px;border-radius:50%;background:var(--glit);pointer-events:none;z-index:9600;}
-@keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0);}}
+@keyframes sigilPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(201,149,14,.5));}50%{filter:drop-shadow(0 0 22px rgba(226,184,48,1));}}
+#invocarSigil{position:absolute;opacity:0;transition:opacity .6s ease;}
+#invocarSigil.on{opacity:1;animation:sigilPulse 1.8s ease-in-out infinite;}
+#invocarText{position:absolute;top:calc(50% + 120px);font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.38em;color:var(--gold);text-transform:uppercase;opacity:0;transition:opacity .4s ease;text-align:center;white-space:nowrap;}
+#invocarText.on{opacity:1;}
+.spark{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:9600;}
+@keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1.2);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0);}}
 </style>
 </head>
 <body>
@@ -236,9 +245,7 @@ body{background:var(--void);color:var(--txt);font-family:'Inter',sans-serif;over
 <header style="position:fixed;top:0;left:0;right:0;z-index:200;padding:1.3rem 2rem;">
   <div class="hpill" id="hpill" style="max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.4rem;">
     <div style="display:flex;align-items:center;gap:.75rem;">
-      <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amb));display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span class="cinzel" style="font-size:.62rem;font-weight:700;color:var(--void);">A33</span>
-      </div>
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><circle cx="19" cy="19" r="18" fill="rgba(9,7,15,.85)" stroke="#C9950E" stroke-width="1.2"/><circle cx="19" cy="19" r="14.5" fill="none" stroke="rgba(201,149,14,.45)" stroke-width=".7" stroke-dasharray="2,2.2"/><polygon points="19,4 20.8,17.2 34,19 20.8,20.8 19,34 17.2,20.8 4,19 17.2,17.2" fill="rgba(201,149,14,.18)" stroke="#C9950E" stroke-width=".9" stroke-linejoin="round"/><circle cx="19" cy="19" r="6.5" fill="rgba(9,7,15,.9)" stroke="rgba(201,149,14,.6)" stroke-width=".8"/><text x="19" y="22.5" text-anchor="middle" font-size="5.2" fill="#E2B830" font-family="Cinzel,serif" font-weight="700" letter-spacing=".5">A33</text><circle cx="19" cy="2.5" r="1.2" fill="#C9950E"/><circle cx="35.5" cy="19" r="1.2" fill="#C9950E"/><circle cx="19" cy="35.5" r="1.2" fill="#C9950E"/><circle cx="2.5" cy="19" r="1.2" fill="#C9950E"/></svg>
       <span class="cinzel" style="font-size:.9rem;font-weight:700;color:var(--gold);letter-spacing:.12em;">ALQUIMIA33</span>
     </div>
     <nav style="display:flex;gap:2rem;align-items:center;">
