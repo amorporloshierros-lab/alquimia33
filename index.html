@@ -1059,78 +1059,86 @@ function sendQ(t){
   setTimeout(()=>{addUser(t);const ty=showTyping();setTimeout(()=>{ty.remove();const r=getBotResponse(t);addBot(r.t,r.bs,r.wa);},650+Math.random()*400);},100);
 }
 
-/* ══ INVOCAR RITUAL — ZOOM AL CIELO + ESTRELLA + LEAD ══ */
+/* ══ INVOCAR — ESTRELLA DESTELLA + ZOOM AL CIELO ══ */
 function invocarRitual(e){
   if(e){e.preventDefault();e.stopPropagation();}
   var cx=(e&&e.clientX)||window.innerWidth/2;
   var cy=(e&&e.clientY)||window.innerHeight/2;
-  // 1 — Sparks
-  for(var i=0;i<24;i++){
+
+  // 1 — Sparks desde el botón
+  for(var i=0;i<20;i++){
     (function(){
-      var sp=document.createElement('div');
-      sp.className='spark';
-      var ang=Math.random()*360,dist=55+Math.random()*110;
-      var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
-      var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
-      var dur=(0.3+Math.random()*0.55).toFixed(2);
-      var sz=(3+Math.random()*5).toFixed(1);
-      sp.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+sz+'px;height:'+sz+'px;background:'+(Math.random()>0.4?'#E2B830':'#fff')+';animation:sparkFly '+dur+'s ease-out forwards;';
-      sp.style.setProperty('--tx',tx+'px');sp.style.setProperty('--ty',ty+'px');
-      document.body.appendChild(sp);
-      setTimeout(function(){sp.remove();},1000);
+      var sp=document.createElement('div');sp.className='spark';
+      var ang=Math.random()*360,dist=50+Math.random()*100;
+      sp.style.cssText='left:'+cx+'px;top:'+cy+'px;width:'+(3+Math.random()*5).toFixed(1)+'px;height:'+(3+Math.random()*5).toFixed(1)+'px;background:'+(Math.random()>.4?'#E2B830':'#fff')+';animation:sparkFly '+(0.3+Math.random()*.5).toFixed(2)+'s ease-out forwards;';
+      sp.style.setProperty('--tx',Math.round(Math.cos(ang*Math.PI/180)*dist)+'px');
+      sp.style.setProperty('--ty',Math.round(Math.sin(ang*Math.PI/180)*dist)+'px');
+      document.body.appendChild(sp);setTimeout(function(){sp.remove();},900);
     })();
   }
-  // 2 — Overlay oscuro
-  document.getElementById('invocarOverlay').classList.add('active');
-  // 3 — Zoom dramático del hero hacia el cielo
-  var vid=document.getElementById('heroVideo');
-  if(vid&&window.gsap){
-    gsap.killTweensOf(vid);
-    gsap.to(vid,{scale:3.2,y:'-8%',duration:3,ease:'power2.in',filter:'brightness(1.6) blur(0px)'});
-  }
-  // 4 — Estrella nace y viaja al cielo
+
+  // 2 — Estrella aparece en el cielo del hero (punto fijo arriba)
+  var starX=window.innerWidth*(0.42+Math.random()*0.16);
+  var starY=window.innerHeight*(0.13+Math.random()*0.1);
   var star=document.getElementById('travelStar');
-  star.style.left=cx+'px';star.style.top=cy+'px';star.style.opacity='1';
-  star.classList.add('glow');
-  var destX=window.innerWidth/2,destY=window.innerHeight*0.08;
-  function onStarArrived(){
-    star.classList.remove('glow');star.style.opacity='0';
-    // 5 — Explosión en el cielo
-    for(var j=0;j<38;j++){
-      (function(){
-        var bp=document.createElement('div');
-        bp.className='spark';
-        var ang=Math.random()*360,dist=12+Math.random()*170;
-        var tx=Math.round(Math.cos(ang*Math.PI/180)*dist);
-        var ty=Math.round(Math.sin(ang*Math.PI/180)*dist);
-        var dur=(0.5+Math.random()*1.1).toFixed(2);
-        var sz=(2+Math.random()*8).toFixed(1);
-        var col=Math.random()>0.5?'#fff':(Math.random()>0.5?'#E2B830':'#C9950E');
-        bp.style.cssText='left:'+destX+'px;top:'+destY+'px;width:'+sz+'px;height:'+sz+'px;background:'+col+';animation:sparkFly '+dur+'s ease-out forwards;';
-        bp.style.setProperty('--tx',tx+'px');bp.style.setProperty('--ty',ty+'px');
-        document.body.appendChild(bp);setTimeout(function(){bp.remove();},1600);
-      })();
+  star.style.left=starX+'px';
+  star.style.top=starY+'px';
+  star.style.transform='translate(-50%,-50%) scale(0)';
+  star.style.opacity='1';
+
+  // Flash repentino: la estrella destella fuerte
+  gsap.to(star,{
+    scale:18,
+    duration:0.12,
+    ease:'power4.in',
+    onComplete:function(){
+      // Brillo máximo — pausa visual
+      setTimeout(function(){
+        // 3 — Zoom del hero hacia la estrella
+        var hero=document.getElementById('hero');
+        var vid=document.getElementById('heroVideo');
+        var heroRect=hero.getBoundingClientRect();
+        var ox=((starX-heroRect.left)/heroRect.width*100).toFixed(1)+'%';
+        var oy=((starY-heroRect.top)/heroRect.height*100).toFixed(1)+'%';
+
+        // Hero se tragaa la camara hacia ese punto
+        gsap.to([vid],{
+          scale:9,
+          transformOrigin:ox+' '+oy,
+          duration:1.1,
+          ease:'power3.in',
+          filter:'brightness(2.5) blur(1px)'
+        });
+
+        // La estrella se desvanece mientras la camara avanza
+        gsap.to(star,{scale:3,opacity:0,duration:0.8,ease:'power2.in'});
+
+        // Overlay oscurece
+        document.getElementById('invocarOverlay').classList.add('active');
+
+        // Form aparece al final del zoom
+        setTimeout(function(){
+          // Reset hero zoom silenciosamente
+          gsap.set(vid,{scale:1,transformOrigin:'50% 50%',filter:'brightness(1) blur(0px)',clearProps:'all'});
+          document.getElementById('lcModal').classList.add('open');
+        },1200);
+      },80);
     }
-    // 6 — Lead form
-    setTimeout(function(){ document.getElementById('lcModal').classList.add('open'); },380);
-  }
-  if(window.gsap){
-    gsap.to(star,{left:destX,top:destY,duration:1.05,delay:0.12,ease:'power3.in',onComplete:onStarArrived});
-  } else { setTimeout(onStarArrived,1200); }
+  });
 }
 
 function closeLcModal(){
   document.getElementById('lcModal').classList.remove('open');
   document.getElementById('invocarOverlay').classList.remove('active');
-  var vid=document.getElementById('heroVideo');
-  if(vid&&window.gsap) gsap.to(vid,{scale:1,y:'0%',duration:1.8,ease:'power2.out',filter:'brightness(1) blur(0px)'});
+  var star=document.getElementById('travelStar');
+  if(star){star.style.opacity='0';star.style.transform='translate(-50%,-50%) scale(0)';}
   setTimeout(function(){
     document.getElementById('lcFormContent').style.display='block';
     document.getElementById('lcThanks').style.display='none';
     document.getElementById('lcName').value='';
     document.getElementById('lcWa').value='';
     document.getElementById('lcNeed').value='';
-  },600);
+  },500);
 }
 
 function submitLcForm(){
@@ -1171,4 +1179,9 @@ function setSoundState(on){
   if(lbl)lbl.textContent=on?'Sonido activo':'Activar sonido';
   if(lbl)lbl.style.color=on?'var(--gold)':'var(--muted)';
 }
-function toggl
+function toggleHeroSound(){
+  setSoundState(!_sndOn);
+}
+// Intento automático cuando el video empieza (funciona en algunos browsers)
+(function(){
+  var vid=do
