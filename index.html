@@ -830,31 +830,17 @@ select.lc-field{-webkit-appearance:none;appearance:none;cursor:pointer;
 window.addEventListener('scroll',()=>document.getElementById('hpill').classList.toggle('sc',scrollY>60));
 
 // ─── HERO VIDEO ZOOM-IN ───
-// Script está al final del body — DOM ya disponible, ejecutar directo
-(function(){
-  var vid=document.getElementById('heroVideo');
-  var curtain=document.getElementById('heroCurtain');
-  if(!vid||!curtain)return;
-
-  // Curtain abre inmediatamente sin esperar el video
-  gsap.set(curtain,{opacity:1});
-  gsap.to(curtain,{opacity:0,duration:1,delay:.3,ease:'power2.out',
-    onComplete:function(){ curtain.style.display='none'; showHeroText(); }
-  });
-
-  // Video zoom cuando tenga datos (o fallback a los 2.5s)
+window.addEventListener('load',()=>{
+  const vid=document.getElementById('heroVideo');
+  const curtain=document.getElementById('heroCurtain');
+  // Start zoomed in, zoom back — cinematic entry
   gsap.set(vid,{scale:1.12,filter:'blur(6px)'});
-  var zoomed=false;
-  function startVideoZoom(){
-    if(zoomed)return; zoomed=true;
-    gsap.to(vid,{scale:1,filter:'blur(0px)',duration:2.8,ease:'power2.out'});
-  }
-  if(vid.readyState>=2){ startVideoZoom(); }
-  else {
-    vid.addEventListener('canplay',startVideoZoom,{once:true});
-    setTimeout(startVideoZoom,2500);
-  }
-})();
+  gsap.set(curtain,{opacity:1});
+  const tl=gsap.timeline();
+  tl.to(curtain,{opacity:0,duration:.8,delay:.3,ease:'power2.out'})
+    .to(vid,{scale:1,filter:'blur(0px)',duration:2.8,ease:'power2.out'},'-=.6')
+    .call(showHeroText);
+});
 
 function showHeroText(){
   gsap.set(['#ht0','#ht1','#ht2','#ht3','#ht4','#ht5','#ht6'],{y:55});
@@ -1065,7 +1051,7 @@ function invocarRitual(e){
   var cx=(e&&e.clientX)||window.innerWidth/2;
   var cy=(e&&e.clientY)||window.innerHeight/2;
 
-  // 1 — Sparks desde el botón
+  // Sparks desde el boton
   for(var i=0;i<20;i++){
     (function(){
       var sp=document.createElement('div');sp.className='spark';
@@ -1077,68 +1063,45 @@ function invocarRitual(e){
     })();
   }
 
-  // 2 — Estrella aparece en el cielo del hero (punto fijo arriba)
+  // Estrella aparece en el cielo (punto fijo arriba)
   var starX=window.innerWidth*(0.42+Math.random()*0.16);
   var starY=window.innerHeight*(0.13+Math.random()*0.1);
   var star=document.getElementById('travelStar');
   star.style.left=starX+'px';
   star.style.top=starY+'px';
-  star.style.transform='translate(-50%,-50%) scale(0)';
   star.style.opacity='1';
 
-  // Flash repentino: la estrella destella fuerte
-  gsap.to(star,{
-    scale:18,
-    duration:0.12,
-    ease:'power4.in',
+  // Flash repentino — la estrella destella enorme
+  gsap.fromTo(star,{scale:0,opacity:0},{scale:20,opacity:1,duration:0.18,ease:'power4.out',
     onComplete:function(){
-      // Brillo máximo — pausa visual
+      // Zoom del hero hacia la estrella
+      var vid=document.getElementById('heroVideo');
+      var hero=document.getElementById('hero');
+      var hRect=hero.getBoundingClientRect();
+      var ox=((starX-hRect.left)/hRect.width*100).toFixed(1)+'%';
+      var oy=((starY-hRect.top)/hRect.height*100).toFixed(1)+'%';
+      gsap.to(vid,{scale:9,transformOrigin:ox+' '+oy,duration:1.1,ease:'power3.in',filter:'brightness(2.5) blur(1px)'});
+      gsap.to(star,{scale:4,opacity:0,duration:0.9,ease:'power2.in'});
+      document.getElementById('invocarOverlay').classList.add('active');
       setTimeout(function(){
-        // 3 — Zoom del hero hacia la estrella
-        var hero=document.getElementById('hero');
-        var vid=document.getElementById('heroVideo');
-        var heroRect=hero.getBoundingClientRect();
-        var ox=((starX-heroRect.left)/heroRect.width*100).toFixed(1)+'%';
-        var oy=((starY-heroRect.top)/heroRect.height*100).toFixed(1)+'%';
-
-        // Hero se tragaa la camara hacia ese punto
-        gsap.to([vid],{
-          scale:9,
-          transformOrigin:ox+' '+oy,
-          duration:1.1,
-          ease:'power3.in',
-          filter:'brightness(2.5) blur(1px)'
-        });
-
-        // La estrella se desvanece mientras la camara avanza
-        gsap.to(star,{scale:3,opacity:0,duration:0.8,ease:'power2.in'});
-
-        // Overlay oscurece
-        document.getElementById('invocarOverlay').classList.add('active');
-
-        // Form aparece al final del zoom
-        setTimeout(function(){
-          // Reset hero zoom silenciosamente
-          gsap.set(vid,{scale:1,transformOrigin:'50% 50%',filter:'brightness(1) blur(0px)',clearProps:'all'});
-          document.getElementById('lcModal').classList.add('open');
-        },1200);
-      },80);
+        gsap.set(vid,{clearProps:'all'});
+        document.getElementById('lcModal').classList.add('open');
+      },1300);
     }
   });
 }
-
 function closeLcModal(){
   document.getElementById('lcModal').classList.remove('open');
   document.getElementById('invocarOverlay').classList.remove('active');
-  var star=document.getElementById('travelStar');
-  if(star){star.style.opacity='0';star.style.transform='translate(-50%,-50%) scale(0)';}
+  var vid=document.getElementById('heroVideo');
+  if(vid&&window.gsap) gsap.to(vid,{scale:1,y:'0%',duration:1.8,ease:'power2.out',filter:'brightness(1) blur(0px)'});
   setTimeout(function(){
     document.getElementById('lcFormContent').style.display='block';
     document.getElementById('lcThanks').style.display='none';
     document.getElementById('lcName').value='';
     document.getElementById('lcWa').value='';
     document.getElementById('lcNeed').value='';
-  },500);
+  },600);
 }
 
 function submitLcForm(){
@@ -1184,4 +1147,15 @@ function toggleHeroSound(){
 }
 // Intento automático cuando el video empieza (funciona en algunos browsers)
 (function(){
-  var vid=do
+  var vid=document.getElementById('heroVideo');
+  if(!vid)return;
+  vid.addEventListener('play',function(){
+    setTimeout(function(){
+      vid.muted=false;vid.volume=0.15;
+      if(!vid.muted){setSoundState(true);}
+    },300);
+  },{once:true});
+})();
+</script>
+</body>
+</html>
